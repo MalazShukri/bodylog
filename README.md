@@ -40,19 +40,30 @@ After that it launches full-screen with no browser chrome and works with no sign
 
 ## How it works
 
+The app has two modes, switched with the pill control at the top: **Workout** and **Tasks**.
+
+**Workout**
 - **Today** — Sunday-anchored week strip at the top; bar height is that day's completion.
   Tap any day to view or fill it in. Tap a row to mark it done. Rows with number logging
   have an input on the side.
 - **Library** — add, edit, delete exercises and categories. Every exercise has a category,
-  an optional type/target/dose, the weekdays it appears on, and an optional tracked number.
-- **Progress** — weekly completion for the last 12 weeks, this week broken down by category,
-  and all-time personal bests.
+  an optional target area/dose, the weekdays it appears on, and an optional tracked number.
+- **Progress** — a scrollable day-by-day feed: each day that had something scheduled gets a
+  card listing its exercises with a ✔/✘. Tap a day to open it on Today. No weekly percentages,
+  no personal-best tracking here — just what happened, per day.
 
-## Weekly reset
+**Tasks**
+- **Tasks** — a plain to-do list. Pin a task and it repeats every day (its checkbox resets
+  each morning); leave it unpinned and it's a one-off for today only, then it rolls off the
+  active list. Tap a task to rename, re-pin, or delete it; tap its checkbox to mark it done.
+- **Progress** — the same day-by-day feed as Workout Progress, but for tasks.
 
-Every Sunday the daily ticks clear. Before clearing, the finished week is summarised into
-history (done/total overall and per category) and kept for 12 weeks. Personal bests are
-never cleared. Rollover runs on load and whenever the app returns to the foreground.
+## Daily housekeeping
+
+The week strip on Today re-anchors to the current Sunday automatically. Day-by-day logs
+(workout and tasks) are kept for the last 84 days and pruned beyond that; one-off tasks past
+their day are pruned the same way. This runs on load and whenever the app returns to the
+foreground — no user action needed.
 
 ## Bilingual text
 
@@ -71,6 +82,6 @@ the migration path if this ever moves into a real database.
 
 - Reset day: `sundayOf()` in `index.html` does `x.getDate() - x.getDay()`. For Monday use
   `(x.getDay() + 6) % 7`; for Saturday use `(x.getDay() + 1) % 7`.
-- Weeks of history: `HISTORY_WEEKS` near the top of the script.
+- Days of history kept: `HISTORY_DAYS` near the top of the script.
 - Units for tracked numbers: the array in `openExSheet` (`["reps","seconds",...]`).
-- After editing, bump `CACHE` in `sw.js` (e.g. `bodylog-v2`) or the old version keeps serving.
+- After editing, bump `CACHE` in `sw.js` (e.g. `bodylog-v3`) or the old version keeps serving.

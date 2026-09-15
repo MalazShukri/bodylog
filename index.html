@@ -29,6 +29,8 @@
   --pad:18px;
   --safe-b:env(safe-area-inset-bottom,0px);
   --safe-t:env(safe-area-inset-top,0px);
+  --shadow:0 2px 10px rgba(18,33,31,.07),0 1px 2px rgba(18,33,31,.06);
+  --shadow-lg:0 -8px 28px rgba(18,33,31,.16);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
@@ -51,9 +53,26 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .view{display:none}
 .view.on{display:block}
 
+/* ---------- mode switch ---------- */
+.modebar{
+  position:sticky;top:0;z-index:30;
+  max-width:620px;margin:0 auto;
+  display:flex;gap:6px;
+  padding:calc(var(--safe-t) + 10px) var(--pad) 10px;
+  background:var(--surface);border-bottom:1px solid var(--rule);
+}
+.mode{
+  flex:1;min-height:38px;border-radius:999px;
+  background:var(--paper);color:var(--muted);font-size:13.5px;font-weight:600;letter-spacing:.01em;
+  border:1px solid var(--rule-soft);
+  transition:background .15s,color .15s,border-color .15s;
+}
+.mode.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.mode:active{opacity:.85}
+
 /* ---------- week strip (the anchor) ---------- */
 .week{
-  padding:calc(var(--safe-t) + 14px) var(--pad) 14px;
+  padding:14px var(--pad);
   background:var(--surface);
   border-bottom:1px solid var(--rule);
 }
@@ -72,16 +91,16 @@ button{background:none;border:0;padding:0;cursor:pointer}
   border-bottom:1.5px solid var(--rule);
 }
 .bar-fill{
-  width:100%;background:var(--teal);min-height:2px;height:0;
+  width:100%;background:linear-gradient(180deg,var(--teal-dim),var(--teal));min-height:2px;height:0;
   transition:height .28s cubic-bezier(.2,.7,.3,1);
-  border-radius:2px 2px 0 0;
+  border-radius:3px 3px 0 0;
 }
 .bar.empty .bar-fill{background:var(--rule)}
 .bar.today .bar-fill{background:var(--ink)}
 .days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:7px}
 .day{
-  font-size:12px;text-align:center;color:var(--muted);padding:5px 0;border-radius:6px;
-  min-height:32px;
+  font-size:12px;text-align:center;color:var(--muted);padding:5px 0;border-radius:8px;
+  min-height:32px;transition:background .15s,color .15s;
 }
 .day.today{color:var(--surface);background:var(--ink);font-weight:600}
 .day.sel:not(.today){background:var(--rule-soft);color:var(--ink);font-weight:600}
@@ -93,7 +112,8 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .group-head{
   display:flex;align-items:center;gap:12px;padding:0 var(--pad) 8px;
 }
-.group-name{font-size:13.5px;font-weight:600;letter-spacing:.02em;white-space:nowrap}
+.group-name{font-size:13.5px;font-weight:600;letter-spacing:.02em;white-space:nowrap;display:flex;align-items:center}
+.group-name::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--teal-dim);margin-inline-end:8px}
 .group-line{flex:1;height:1px;background:var(--rule)}
 .group-count{font-size:12.5px;color:var(--muted);white-space:nowrap}
 
@@ -101,14 +121,17 @@ button{background:none;border:0;padding:0;cursor:pointer}
   display:flex;align-items:center;gap:13px;width:100%;text-align:start;
   min-height:var(--tap);padding:9px var(--pad);
   border-bottom:1px solid var(--rule-soft);
-  background:transparent;
+  background:transparent;transition:background .15s;
 }
 .row:first-of-type{border-top:1px solid var(--rule-soft)}
 .row:active{background:var(--surface)}
+.row.done{background:rgba(31,111,99,.05)}
 .box{
-  flex:0 0 auto;width:23px;height:23px;border:1.5px solid var(--rule);border-radius:6px;
+  flex:0 0 auto;width:24px;height:24px;border:1.5px solid var(--rule);border-radius:7px;
   display:grid;place-items:center;background:var(--surface);
+  transition:background .15s,border-color .15s,transform .1s;
 }
+.box:active{transform:scale(.9)}
 .box svg{width:14px;height:14px;opacity:0;transform:scale(.6);transition:opacity .15s,transform .15s}
 .row.done .box{background:var(--teal);border-color:var(--teal)}
 .row.done .box svg{opacity:1;transform:scale(1)}
@@ -127,7 +150,6 @@ button{background:none;border:0;padding:0;cursor:pointer}
 }
 .val input::-webkit-outer-spin-button,.val input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .val span{font-size:11px;color:var(--muted)}
-.pb{color:var(--amber);font-weight:600}
 
 /* ---------- misc ---------- */
 .empty-state{padding:44px var(--pad);text-align:center;color:var(--muted);font-size:14.5px}
@@ -136,15 +158,16 @@ button{background:none;border:0;padding:0;cursor:pointer}
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   min-height:46px;padding:0 20px;border-radius:var(--r);
   background:var(--ink);color:var(--surface);font-size:15px;font-weight:500;
+  box-shadow:0 1px 2px rgba(18,33,31,.15);transition:transform .1s,opacity .15s;
 }
-.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--rule)}
-.btn.danger{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--rule);box-shadow:none}
+.btn.danger{background:transparent;color:var(--danger);border:1px solid var(--danger);box-shadow:none}
 .btn.wide{width:100%}
-.btn:active{opacity:.8}
+.btn:active{opacity:.8;transform:scale(.98)}
 
 .page-head{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:calc(var(--safe-t) + 18px) var(--pad) 14px;
+  padding:18px var(--pad) 14px;
   background:var(--surface);border-bottom:1px solid var(--rule);
 }
 .page-head h1{font-size:19px;font-weight:600;margin:0;letter-spacing:.01em}
@@ -153,13 +176,15 @@ button{background:none;border:0;padding:0;cursor:pointer}
 /* ---------- tabbar ---------- */
 .tabs{
   position:fixed;left:0;right:0;bottom:0;z-index:40;
-  display:grid;grid-template-columns:repeat(3,1fr);
-  background:var(--surface);border-top:1px solid var(--rule);
+  display:grid;
+  background:var(--surface);
+  box-shadow:var(--shadow-lg);
   padding-bottom:var(--safe-b);
 }
-.tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 8px;color:var(--muted);font-size:11.5px}
+.tab{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 8px;color:var(--muted);font-size:11.5px;transition:color .15s}
 .tab svg{width:21px;height:21px}
 .tab.on{color:var(--ink);font-weight:600}
+.tab.on::before{content:"";position:absolute;top:1px;width:26px;height:3px;border-radius:2px;background:var(--ink)}
 
 /* ---------- sheet ---------- */
 .scrim{position:fixed;inset:0;background:rgba(18,33,31,.42);z-index:50;display:none}
@@ -167,7 +192,8 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .sheet{
   position:fixed;left:0;right:0;bottom:0;z-index:51;
   max-width:620px;margin:0 auto;max-height:92vh;overflow-y:auto;
-  background:var(--paper);border-radius:16px 16px 0 0;
+  background:var(--paper);border-radius:18px 18px 0 0;
+  box-shadow:var(--shadow-lg);
   padding:8px var(--pad) calc(24px + var(--safe-b));
   display:none;
 }
@@ -184,28 +210,35 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .daypick{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
 .daypick button{
   min-height:44px;border:1px solid var(--rule);border-radius:8px;background:var(--surface);
-  font-size:13px;color:var(--muted);
+  font-size:13px;color:var(--muted);transition:background .15s,color .15s;
 }
 .daypick button.on{background:var(--ink);color:var(--surface);border-color:var(--ink);font-weight:600}
 .checkline{display:flex;align-items:center;gap:10px;min-height:46px}
 .checkline input{width:20px;height:20px;accent-color:var(--teal)}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .sheet-actions{display:flex;gap:10px;margin-top:22px}
 .sheet-actions .btn{flex:1}
 
-/* ---------- progress ---------- */
-.hist{padding:22px var(--pad) 0}
-.hbar{display:flex;align-items:center;gap:11px;min-height:34px}
-.hbar-label{font-size:12px;color:var(--muted);width:52px;flex:0 0 auto}
-.hbar-track{flex:1;height:9px;background:var(--rule-soft);border-radius:5px;overflow:hidden}
-.hbar-fill{height:100%;background:var(--teal);border-radius:5px}
-.hbar-pct{font-size:12px;color:var(--muted);width:40px;text-align:end;flex:0 0 auto}
-.hbar.current .hbar-fill{background:var(--ink)}
-.hbar.current .hbar-label{color:var(--ink);font-weight:600}
-.pbrow{display:flex;align-items:baseline;gap:12px;padding:11px var(--pad);border-bottom:1px solid var(--rule-soft)}
-.pbrow .n{flex:1;font-size:15px;min-width:0;word-break:break-word}
-.pbrow .v{font-size:15px;font-weight:600;color:var(--amber);white-space:nowrap}
-.pbrow .d{font-size:11.5px;color:var(--muted);white-space:nowrap}
+/* ---------- day-feed progress ---------- */
+.daycard{
+  margin:0 var(--pad) 14px;border:1px solid var(--rule-soft);border-radius:14px;
+  background:var(--surface);box-shadow:var(--shadow);overflow:hidden;
+}
+.daycard.today{border-color:var(--teal-dim)}
+.daycard-head{
+  display:block;width:100%;text-align:start;padding:12px 16px;
+  font-size:13.5px;font-weight:600;background:var(--rule-soft);color:var(--ink);
+}
+.daycard.today .daycard-head{background:var(--teal-dim);color:var(--surface)}
+.daycard-head[data-tap="1"]{cursor:pointer}
+.dayitem{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 16px;border-top:1px solid var(--rule-soft);font-size:14.5px;
+}
+.dayitem-name{min-width:0;word-break:break-word}
+.dayitem-mark{font-size:15px;color:var(--rule);flex:0 0 auto}
+.dayitem.done .dayitem-name{color:var(--muted)}
+.dayitem.done .dayitem-mark{color:var(--teal);font-weight:700}
+
 .note{padding:16px var(--pad);font-size:12.5px;color:var(--muted);line-height:1.5}
 
 .toast{
@@ -218,6 +251,11 @@ button{background:none;border:0;padding:0;cursor:pointer}
 </style>
 </head>
 <body>
+
+<div class="modebar" id="modebar">
+  <button class="mode on" data-mode="workout">Workout</button>
+  <button class="mode" data-mode="tasks">Tasks</button>
+</div>
 
 <div id="app">
 
@@ -246,18 +284,38 @@ button{background:none;border:0;padding:0;cursor:pointer}
     </div>
   </section>
 
-  <!-- PROGRESS -->
-  <section class="view" id="v-prog">
+  <!-- WORKOUT PROGRESS -->
+  <section class="view" id="v-wprog">
     <div class="page-head">
       <h1>Progress</h1>
       <button class="link" id="dataBtn">Data</button>
     </div>
-    <div id="progBody"></div>
+    <div id="wprogBody"></div>
+  </section>
+
+  <!-- TASKS -->
+  <section class="view" id="v-tasks">
+    <div class="page-head">
+      <h1>Tasks</h1>
+    </div>
+    <div id="taskList"></div>
+    <div style="padding:22px var(--pad) 8px">
+      <button class="btn wide" id="addTaskBtn">Add task</button>
+    </div>
+  </section>
+
+  <!-- TASK PROGRESS -->
+  <section class="view" id="v-tprog">
+    <div class="page-head">
+      <h1>Progress</h1>
+      <button class="link" id="dataBtn2">Data</button>
+    </div>
+    <div id="tprogBody"></div>
   </section>
 
 </div>
 
-<nav class="tabs">
+<nav class="tabs" id="tabs-workout" style="grid-template-columns:repeat(3,1fr)">
   <button class="tab on" data-view="today">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4M8.5 14.5l2.2 2.2 4.3-4.6"/></svg>
     Today
@@ -266,7 +324,18 @@ button{background:none;border:0;padding:0;cursor:pointer}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h10"/><circle cx="19" cy="19" r="2.6"/></svg>
     Library
   </button>
-  <button class="tab" data-view="prog">
+  <button class="tab" data-view="wprog">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+    Progress
+  </button>
+</nav>
+
+<nav class="tabs" id="tabs-tasks" style="grid-template-columns:repeat(2,1fr);display:none">
+  <button class="tab on" data-view="tasks">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12.5l2.2 2.2L16 9.5"/><rect x="3" y="3" width="18" height="18" rx="4"/></svg>
+    Tasks
+  </button>
+  <button class="tab" data-view="tprog">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
     Progress
   </button>
@@ -282,7 +351,7 @@ button{background:none;border:0;padding:0;cursor:pointer}
 const KEY = "bodylog.v1";
 const DAY_ABBR = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-const HISTORY_WEEKS = 12;
+const HISTORY_DAYS = 84;
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 
@@ -303,7 +372,7 @@ function fmtShort(isoStr){ const d = parseISO(isoStr); return d.getDate()+" "+MO
 function defaultState(){
   const ws = sundayOf(new Date());
   return {
-    v: 1,
+    v: 2,
     weekStart: ws,
     categories: [
       { id: uid(), name: "Stretching & Mobility" },
@@ -314,13 +383,14 @@ function defaultState(){
     ],
     exercises: [],
     log: {},
-    history: [],
-    pbs: {}
+    tasks: [],
+    taskLog: {}
   };
 }
 
 let state;
 let selectedDate = iso(new Date());
+let mode = "workout";
 
 function load(){
   try {
@@ -330,8 +400,10 @@ function load(){
   if(!state || !state.categories) state = defaultState();
   state.exercises = state.exercises || [];
   state.log = state.log || {};
-  state.history = state.history || [];
-  state.pbs = state.pbs || {};
+  state.tasks = state.tasks || [];
+  state.taskLog = state.taskLog || {};
+  delete state.history;
+  delete state.pbs;
   rollover();
 }
 function save(){
@@ -339,7 +411,20 @@ function save(){
   catch(e){ toast("Storage full — export a backup"); }
 }
 
-/* ============ weekly rollover ============ */
+/* ============ rollover / retention ============ */
+function pruneOld(){
+  const cutoff = addDays(iso(new Date()), -HISTORY_DAYS);
+  Object.keys(state.log).forEach(d => { if(d < cutoff) delete state.log[d]; });
+  Object.keys(state.taskLog).forEach(d => { if(d < cutoff) delete state.taskLog[d]; });
+  state.tasks = state.tasks.filter(t => t.pinned || t.date >= cutoff);
+}
+function rollover(){
+  state.weekStart = sundayOf(new Date());
+  pruneOld();
+  save();
+}
+
+/* ============ scheduling ============ */
 function scheduledOn(dateStr){
   const dow = parseISO(dateStr).getDay();
   return state.exercises.filter(ex => ex.days.includes(dow));
@@ -350,37 +435,8 @@ function dayStats(dateStr){
   const done = list.filter(ex => day[ex.id] && day[ex.id].done).length;
   return { done, total: list.length };
 }
-function summarizeWeek(ws){
-  const cats = {};
-  state.categories.forEach(c => cats[c.id] = { done:0, total:0 });
-  let done = 0, total = 0;
-  weekDates(ws).forEach(d => {
-    const day = state.log[d] || {};
-    scheduledOn(d).forEach(ex => {
-      total++;
-      if(cats[ex.cat]) cats[ex.cat].total++;
-      if(day[ex.id] && day[ex.id].done){
-        done++;
-        if(cats[ex.cat]) cats[ex.cat].done++;
-      }
-    });
-  });
-  return { weekStart: ws, cats, done, total };
-}
-function rollover(){
-  const cur = sundayOf(new Date());
-  if(state.weekStart === cur) return;
-  const past = summarizeWeek(state.weekStart);
-  if(past.total > 0 || past.done > 0){
-    state.history = state.history.filter(h => h.weekStart !== past.weekStart);
-    state.history.push(past);
-    state.history.sort((a,b) => a.weekStart < b.weekStart ? -1 : 1);
-    if(state.history.length > HISTORY_WEEKS) state.history = state.history.slice(-HISTORY_WEEKS);
-  }
-  const keep = new Set(weekDates(cur));
-  Object.keys(state.log).forEach(d => { if(!keep.has(d)) delete state.log[d]; });
-  state.weekStart = cur;
-  save();
+function tasksOn(dateStr){
+  return state.tasks.filter(t => t.pinned ? t.date <= dateStr : t.date === dateStr);
 }
 
 /* ============ helpers ============ */
@@ -403,10 +459,6 @@ function toast(msg){
   t.classList.add("on");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove("on"), 2000);
-}
-function catName(id){
-  const c = state.categories.find(c => c.id === id);
-  return c ? c.name : "—";
 }
 function doseLine(ex){
   const bits = [];
@@ -535,7 +587,6 @@ function exRow(ex){
     inp.onchange = () => {
       const num = inp.value === "" ? null : Number(inp.value);
       setEntry(ex.id, { val: num });
-      if(num !== null) checkPB(ex, num);
       renderToday();
     };
     const u = el("span", null, ex.unit || "reps");
@@ -557,14 +608,6 @@ function setEntry(exId, patch){
   const cur = state.log[selectedDate][exId] || { done:false, val:null };
   state.log[selectedDate][exId] = Object.assign(cur, patch);
   save();
-}
-function checkPB(ex, num){
-  const cur = state.pbs[ex.id];
-  if(!cur || num > cur.val){
-    state.pbs[ex.id] = { val:num, date:selectedDate };
-    save();
-    toast("New best: " + num + " " + (ex.unit || "reps"));
-  }
 }
 
 /* ============ LIBRARY ============ */
@@ -608,7 +651,7 @@ function renderLib(){
         : "Not scheduled";
       const metaBits = [dayStr];
       if(ex.dose) metaBits.push(ex.dose);
-      if(ex.type) metaBits.push(ex.type);
+      if(ex.target) metaBits.push(ex.target);
       const m = el("div","row-meta");
       bidi(m, metaBits.join(" · "));
       main.appendChild(m);
@@ -659,7 +702,7 @@ function openExSheet(ex){
   const editing = !!ex;
   const draft = editing
     ? JSON.parse(JSON.stringify(ex))
-    : { id: uid(), cat: state.categories[0] ? state.categories[0].id : null, name:"", type:"", target:"", dose:"", days:[], track:false, unit:"reps" };
+    : { id: uid(), cat: state.categories[0] ? state.categories[0].id : null, name:"", target:"", dose:"", days:[], track:false, unit:"reps" };
 
   openSheet(body => {
     body.appendChild(el("h2", null, editing ? "Edit exercise" : "New exercise"));
@@ -677,23 +720,11 @@ function openExSheet(ex){
     });
     body.appendChild(makeField("Category", catS));
 
-    const two = el("div","two");
-    const typeS = document.createElement("select");
-    [["","—"],["stretch","Stretch"],["strengthen","Strengthen"],["mobility","Mobility"]].forEach(([v,t]) => {
-      const o = document.createElement("option");
-      o.value = v; o.textContent = t;
-      if(v === draft.type) o.selected = true;
-      typeS.appendChild(o);
-    });
     const doseI = textInput(draft.dose, "3 × 12 / 30s");
-    const f1 = makeField("Type", typeS); f1.style.marginBottom = "0";
-    const f2 = makeField("Sets / reps / time", doseI); f2.style.marginBottom = "0";
-    two.appendChild(f1); two.appendChild(f2);
-    const twoWrap = el("div","field"); twoWrap.appendChild(two);
-    body.appendChild(twoWrap);
+    body.appendChild(makeField("Sets / reps / time", doseI));
 
     const targetI = textInput(draft.target, "neck, glutes, wrists …");
-    body.appendChild(makeField("Target area (optional)", targetI));
+    body.appendChild(makeField("What it targets (optional)", targetI));
 
     const dp = el("div","daypick");
     DAY_ABBR.forEach((d, i) => {
@@ -714,7 +745,7 @@ function openExSheet(ex){
     cb.type = "checkbox"; cb.checked = !!draft.track; cb.id = "trackcb";
     const lb = document.createElement("label");
     lb.setAttribute("for","trackcb");
-    lb.textContent = "Log a number for this (tracks personal best)";
+    lb.textContent = "Log a number for this";
     lb.style.margin = "0"; lb.style.fontSize = "14.5px"; lb.style.color = "var(--ink)";
     cl.appendChild(cb); cl.appendChild(lb);
     const clF = el("div","field"); clF.appendChild(cl);
@@ -742,7 +773,7 @@ function openExSheet(ex){
       if(!draft.days.length){ toast("Pick at least one day"); return; }
       const rec = {
         id: draft.id, cat: catS.value, name: name,
-        type: typeS.value, target: targetI.value.trim(), dose: doseI.value.trim(),
+        target: targetI.value.trim(), dose: doseI.value.trim(),
         days: draft.days.slice().sort(), track: cb.checked, unit: unitS.value
       };
       const idx = state.exercises.findIndex(e => e.id === rec.id);
@@ -757,11 +788,10 @@ function openExSheet(ex){
       const del = el("button","btn danger wide","Delete exercise");
       del.style.marginTop = "10px";
       del.onclick = () => {
-        if(!confirm("Delete this exercise? Its logs and best are removed too.")) return;
+        if(!confirm("Delete this exercise? Its logs are removed too.")) return;
         state.exercises = state.exercises.filter(e => e.id !== ex.id);
-        delete state.pbs[ex.id];
         Object.keys(state.log).forEach(d => { if(state.log[d]) delete state.log[d][ex.id]; });
-        save(); closeSheet(); renderLib(); renderToday(); renderProg();
+        save(); closeSheet(); renderLib(); renderToday(); renderWProg();
         toast("Deleted");
       };
       body.appendChild(del);
@@ -790,7 +820,7 @@ function openCatSheet(cat){
       } else {
         state.categories.push({ id: uid(), name: name });
       }
-      save(); closeSheet(); renderLib(); renderToday(); renderProg();
+      save(); closeSheet(); renderLib(); renderToday(); renderWProg();
       toast(editing ? "Saved" : "Added");
     };
     acts.appendChild(cancel); acts.appendChild(savB);
@@ -804,7 +834,7 @@ function openCatSheet(cat){
         if(count){ toast("Move or delete its " + count + " exercises first"); return; }
         if(!confirm("Delete this category?")) return;
         state.categories = state.categories.filter(c => c.id !== cat.id);
-        save(); closeSheet(); renderLib(); renderToday(); renderProg();
+        save(); closeSheet(); renderLib(); renderToday(); renderWProg();
         toast("Deleted");
       };
       body.appendChild(del);
@@ -812,94 +842,208 @@ function openCatSheet(cat){
   });
 }
 
-/* ============ PROGRESS ============ */
-function renderProg(){
-  const wrap = document.getElementById("progBody");
+/* ============ day-feed progress (shared by workout + tasks) ============ */
+function dayCard(dateStr, items, isDoneFn, onDayTap){
+  const todayStr = iso(new Date());
+  const isToday = dateStr === todayStr;
+  const card = el("div","daycard" + (isToday ? " today" : ""));
+  const dt = parseISO(dateStr);
+  const label = (isToday ? "Today · " : "") + DAY_ABBR[dt.getDay()] + " " + fmtShort(dateStr);
+  const head = el(onDayTap ? "button" : "div", "daycard-head", label);
+  if(onDayTap){
+    head.setAttribute("data-tap","1");
+    head.onclick = () => onDayTap(dateStr);
+  }
+  card.appendChild(head);
+  items.forEach(it => {
+    const done = isDoneFn(dateStr, it);
+    const row = el("div","dayitem" + (done ? " done" : ""));
+    const nm = el("span","dayitem-name");
+    bidi(nm, it.name);
+    row.appendChild(nm);
+    row.appendChild(el("span","dayitem-mark", done ? "✔" : "✘"));
+    card.appendChild(row);
+  });
+  return card;
+}
+function renderDayFeed(wrap, getItemsForDate, isDoneFn, onDayTap, emptyMsg){
+  const todayStr = iso(new Date());
+  let any = false;
+  for(let i = 0; i < HISTORY_DAYS; i++){
+    const d = addDays(todayStr, -i);
+    const items = getItemsForDate(d);
+    if(!items.length) continue;
+    any = true;
+    wrap.appendChild(dayCard(d, items, isDoneFn, onDayTap));
+  }
+  if(!any) wrap.appendChild(el("div","empty-state", emptyMsg));
+}
+
+/* ============ WORKOUT PROGRESS ============ */
+function renderWProg(){
+  const wrap = document.getElementById("wprogBody");
   wrap.innerHTML = "";
+  wrap.appendChild(el("div", null)).style.height = "18px";
+  renderDayFeed(
+    wrap,
+    d => scheduledOn(d),
+    (d, ex) => !!(state.log[d] && state.log[d][ex.id] && state.log[d][ex.id].done),
+    d => { selectedDate = d; switchMode("workout"); switchView("today"); },
+    state.exercises.length ? "Nothing logged yet — finish a day and it shows up here." : "No exercises yet. Add some in Library."
+  );
+  wrap.appendChild(el("div","note","Kept for the last " + HISTORY_DAYS + " days. Tap a day to open it."));
+}
 
-  const current = summarizeWeek(state.weekStart);
-  const weeks = state.history.concat([current]);
-  const real = weeks.filter(w => w.total > 0);
+/* ============ TASKS ============ */
+function renderTasks(){
+  const wrap = document.getElementById("taskList");
+  wrap.innerHTML = "";
+  const today = iso(new Date());
+  const pinned = state.tasks.filter(t => t.pinned && t.date <= today);
+  const oneOff = state.tasks.filter(t => !t.pinned && t.date === today);
 
-  const h1 = el("div","group-head");
-  h1.style.paddingTop = "22px";
-  h1.appendChild(el("div","group-name","Weekly completion"));
-  h1.appendChild(el("div","group-line"));
-  wrap.appendChild(h1);
-
-  if(!real.length){
-    wrap.appendChild(el("div","empty-state","Finish a few days and your weeks show up here."));
-  } else {
-    const hist = el("div","hist");
-    real.slice(-HISTORY_WEEKS - 1).forEach(w => {
-      const pct = w.total ? Math.round(w.done / w.total * 100) : 0;
-      const isCur = w.weekStart === state.weekStart;
-      const r = el("div","hbar" + (isCur ? " current" : ""));
-      r.appendChild(el("div","hbar-label", isCur ? "Now" : fmtShort(w.weekStart)));
-      const tr = el("div","hbar-track");
-      const fl = el("div","hbar-fill");
-      fl.style.width = pct + "%";
-      tr.appendChild(fl);
-      r.appendChild(tr);
-      r.appendChild(el("div","hbar-pct", pct + "%"));
-      hist.appendChild(r);
-    });
-    wrap.appendChild(hist);
-
-    const h2 = el("div","group-head");
-    h2.style.paddingTop = "30px";
-    h2.appendChild(el("div","group-name","This week by category"));
-    h2.appendChild(el("div","group-line"));
-    wrap.appendChild(h2);
-    const catBox = el("div","hist");
-    let any = false;
-    state.categories.forEach(c => {
-      const s = current.cats[c.id];
-      if(!s || !s.total) return;
-      any = true;
-      const pct = Math.round(s.done / s.total * 100);
-      const r = el("div","hbar");
-      const lab = el("div","hbar-label");
-      lab.style.width = "auto";
-      lab.style.flex = "0 0 34%";
-      bidi(lab, c.name);
-      r.appendChild(lab);
-      const tr = el("div","hbar-track");
-      const fl = el("div","hbar-fill");
-      fl.style.width = pct + "%";
-      tr.appendChild(fl);
-      r.appendChild(tr);
-      r.appendChild(el("div","hbar-pct", pct + "%"));
-      catBox.appendChild(r);
-    });
-    if(!any) catBox.appendChild(el("div","note","Nothing scheduled this week."));
-    wrap.appendChild(catBox);
+  if(!pinned.length && !oneOff.length){
+    const e = el("div","empty-state");
+    e.appendChild(el("p", null, "No tasks yet. Pin one to repeat it daily, or add one just for today."));
+    wrap.appendChild(e);
+    return;
   }
 
-  const pbIds = Object.keys(state.pbs);
-  const h3 = el("div","group-head");
-  h3.style.paddingTop = "30px";
-  h3.appendChild(el("div","group-name","Personal bests"));
-  h3.appendChild(el("div","group-line"));
-  wrap.appendChild(h3);
-  if(!pbIds.length){
-    wrap.appendChild(el("div","note","Turn on number logging for an exercise and your best is kept here for good — it survives the weekly reset."));
-  } else {
-    pbIds.forEach(id => {
-      const ex = state.exercises.find(e => e.id === id);
-      if(!ex) return;
-      const pb = state.pbs[id];
-      const r = el("div","pbrow");
-      const n = el("div","n");
-      bidi(n, ex.name);
-      r.appendChild(n);
-      r.appendChild(el("div","v", pb.val + " " + (ex.unit || "")));
-      r.appendChild(el("div","d", fmtShort(pb.date)));
-      wrap.appendChild(r);
-    });
+  if(pinned.length){
+    const g = el("div","group");
+    const gh = el("div","group-head");
+    gh.appendChild(el("div","group-name","Pinned · repeats daily"));
+    gh.appendChild(el("div","group-line"));
+    gh.appendChild(el("div","group-count", pinned.length));
+    g.appendChild(gh);
+    pinned.forEach(t => g.appendChild(taskRow(t)));
+    wrap.appendChild(g);
   }
+  if(oneOff.length){
+    const g = el("div","group");
+    const gh = el("div","group-head");
+    gh.appendChild(el("div","group-name","Today"));
+    gh.appendChild(el("div","group-line"));
+    gh.appendChild(el("div","group-count", oneOff.length));
+    g.appendChild(gh);
+    oneOff.forEach(t => g.appendChild(taskRow(t)));
+    wrap.appendChild(g);
+  }
+}
 
-  wrap.appendChild(el("div","note","Each week starts fresh on Sunday. Daily ticks are cleared, week totals and bests are kept — the last " + HISTORY_WEEKS + " weeks."));
+function taskRow(t){
+  const today = iso(new Date());
+  const day = state.taskLog[today] || {};
+  const entry = day[t.id] || {};
+  const row = el("div","row" + (entry.done ? " done" : ""));
+  row.setAttribute("role","button");
+  row.tabIndex = 0;
+
+  const box = el("div","box");
+  box.innerHTML = CHECK_SVG;
+  box.setAttribute("role","button");
+  box.tabIndex = 0;
+  const toggle = e => { e.stopPropagation(); toggleTask(t); };
+  box.onclick = toggle;
+  box.onkeydown = e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); toggle(e); } };
+  row.appendChild(box);
+
+  const main = el("div","row-main");
+  const name = el("div","row-name");
+  bidi(name, t.name);
+  main.appendChild(name);
+  if(t.pinned){
+    const m = el("div","row-meta","Repeats daily");
+    main.appendChild(m);
+  }
+  row.appendChild(main);
+
+  const chev = el("div","group-count","›");
+  chev.style.fontSize = "20px";
+  row.appendChild(chev);
+
+  const openEdit = () => openTaskSheet(t);
+  row.onclick = openEdit;
+  row.onkeydown = e => { if(e.key === "Enter"){ e.preventDefault(); openEdit(); } };
+  return row;
+}
+
+function toggleTask(t){
+  const today = iso(new Date());
+  if(!state.taskLog[today]) state.taskLog[today] = {};
+  const cur = state.taskLog[today][t.id] || { done:false };
+  state.taskLog[today][t.id] = { done: !cur.done };
+  save(); renderTasks();
+}
+
+function openTaskSheet(t){
+  const editing = !!t;
+  const draft = editing
+    ? JSON.parse(JSON.stringify(t))
+    : { id: uid(), name:"", pinned:false, date: iso(new Date()) };
+
+  openSheet(body => {
+    body.appendChild(el("h2", null, editing ? "Edit task" : "New task"));
+
+    const nameI = textInput(draft.name, "Task name — English or العربية");
+    body.appendChild(makeField("Name", nameI));
+
+    const cl = el("div","checkline");
+    const cb = document.createElement("input");
+    cb.type = "checkbox"; cb.checked = !!draft.pinned; cb.id = "pincb";
+    const lb = document.createElement("label");
+    lb.setAttribute("for","pincb");
+    lb.textContent = "Pin — repeats every day";
+    lb.style.margin = "0"; lb.style.fontSize = "14.5px"; lb.style.color = "var(--ink)";
+    cl.appendChild(cb); cl.appendChild(lb);
+    const clF = el("div","field"); clF.appendChild(cl);
+    body.appendChild(clF);
+
+    const acts = el("div","sheet-actions");
+    const cancel = el("button","btn ghost","Cancel");
+    cancel.onclick = closeSheet;
+    const savB = el("button","btn", editing ? "Save changes" : "Add task");
+    savB.onclick = () => {
+      const name = nameI.value.trim();
+      if(!name){ toast("Give the task a name"); nameI.focus(); return; }
+      const rec = { id: draft.id, name: name, pinned: cb.checked, date: draft.date };
+      const idx = state.tasks.findIndex(x => x.id === rec.id);
+      if(idx >= 0) state.tasks[idx] = rec; else state.tasks.push(rec);
+      save(); closeSheet(); renderTasks();
+      toast(editing ? "Saved" : "Added");
+    };
+    acts.appendChild(cancel); acts.appendChild(savB);
+    body.appendChild(acts);
+
+    if(editing){
+      const del = el("button","btn danger wide","Delete task");
+      del.style.marginTop = "10px";
+      del.onclick = () => {
+        if(!confirm("Delete this task? Its history is removed too.")) return;
+        state.tasks = state.tasks.filter(x => x.id !== t.id);
+        Object.keys(state.taskLog).forEach(d => { if(state.taskLog[d]) delete state.taskLog[d][t.id]; });
+        save(); closeSheet(); renderTasks(); renderTProg();
+        toast("Deleted");
+      };
+      body.appendChild(del);
+    }
+    setTimeout(() => nameI.focus(), 60);
+  });
+}
+
+/* ============ TASK PROGRESS ============ */
+function renderTProg(){
+  const wrap = document.getElementById("tprogBody");
+  wrap.innerHTML = "";
+  wrap.appendChild(el("div", null)).style.height = "18px";
+  renderDayFeed(
+    wrap,
+    d => tasksOn(d),
+    (d, t) => !!(state.taskLog[d] && state.taskLog[d][t.id] && state.taskLog[d][t.id].done),
+    d => { if(d === iso(new Date())){ switchMode("tasks"); switchView("tasks"); } },
+    state.tasks.length ? "Nothing logged yet." : "No tasks yet. Add one in Tasks."
+  );
+  wrap.appendChild(el("div","note","Kept for the last " + HISTORY_DAYS + " days."));
 }
 
 /* ============ data sheet ============ */
@@ -937,10 +1081,12 @@ function openDataSheet(){
           state = data;
           state.exercises = state.exercises || [];
           state.log = state.log || {};
-          state.history = state.history || [];
-          state.pbs = state.pbs || {};
+          state.tasks = state.tasks || [];
+          state.taskLog = state.taskLog || {};
+          delete state.history;
+          delete state.pbs;
           rollover(); save(); closeSheet();
-          renderToday(); renderLib(); renderProg();
+          renderToday(); renderLib(); renderWProg(); renderTasks(); renderTProg();
           toast("Backup restored");
         } catch(e){ toast("That file isn't a Body Log backup"); }
       };
@@ -953,13 +1099,13 @@ function openDataSheet(){
 
     const wipe = el("button","btn danger wide","Erase everything");
     wipe.onclick = () => {
-      if(!confirm("Erase all exercises, logs and bests on this device?")) return;
+      if(!confirm("Erase all exercises, tasks and logs on this device?")) return;
       if(!confirm("Last chance — this cannot be undone.")) return;
       localStorage.removeItem(KEY);
       state = defaultState();
       selectedDate = iso(new Date());
       save(); closeSheet();
-      renderToday(); renderLib(); renderProg();
+      renderToday(); renderLib(); renderWProg(); renderTasks(); renderTProg();
       toast("Erased");
     };
     body.appendChild(wipe);
@@ -967,6 +1113,13 @@ function openDataSheet(){
 }
 
 /* ============ nav ============ */
+function switchMode(m){
+  mode = m;
+  document.querySelectorAll(".mode").forEach(b => b.classList.toggle("on", b.dataset.mode === m));
+  document.getElementById("tabs-workout").style.display = m === "workout" ? "grid" : "none";
+  document.getElementById("tabs-tasks").style.display = m === "tasks" ? "grid" : "none";
+  switchView(m === "workout" ? "today" : "tasks");
+}
 function switchView(v){
   document.querySelectorAll(".view").forEach(s => s.classList.remove("on"));
   document.getElementById("v-" + v).classList.add("on");
@@ -974,26 +1127,31 @@ function switchView(v){
   window.scrollTo(0, 0);
   if(v === "today") renderToday();
   if(v === "lib") renderLib();
-  if(v === "prog") renderProg();
+  if(v === "wprog") renderWProg();
+  if(v === "tasks") renderTasks();
+  if(v === "tprog") renderTProg();
 }
+document.querySelectorAll(".mode").forEach(b => { b.onclick = () => switchMode(b.dataset.mode); });
 document.querySelectorAll(".tab").forEach(t => { t.onclick = () => switchView(t.dataset.view); });
 document.getElementById("addExBtn").onclick = () => openExSheet(null);
 document.getElementById("addCatBtn").onclick = () => openCatSheet(null);
+document.getElementById("addTaskBtn").onclick = () => openTaskSheet(null);
 document.getElementById("dataBtn").onclick = openDataSheet;
+document.getElementById("dataBtn2").onclick = openDataSheet;
 
 document.addEventListener("visibilitychange", () => {
   if(document.visibilityState === "visible"){
     const t = iso(new Date());
-    if(sundayOf(new Date()) !== state.weekStart){ rollover(); }
+    rollover();
     if(!weekDates(state.weekStart).includes(selectedDate)) selectedDate = t;
-    renderToday();
+    renderToday(); renderTasks(); renderWProg(); renderTProg();
   }
 });
 
 /* ============ boot ============ */
 load();
 if(!weekDates(state.weekStart).includes(selectedDate)) selectedDate = iso(new Date());
-renderToday(); renderLib(); renderProg();
+renderToday(); renderLib(); renderWProg(); renderTasks(); renderTProg();
 
 if("serviceWorker" in navigator){
   window.addEventListener("load", () => {
