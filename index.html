@@ -76,28 +76,7 @@ button{background:none;border:0;padding:0;cursor:pointer}
   background:var(--surface);
   border-bottom:1px solid var(--rule);
 }
-.week-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
-.week-title{font-size:15px;font-weight:600;letter-spacing:.01em}
-.week-sub{font-size:13px;color:var(--muted)}
-.bars{
-  display:grid;grid-template-columns:repeat(7,1fr);gap:6px;
-  height:74px;align-items:end;
-  background:
-    repeating-linear-gradient(to top,var(--rule-soft) 0 1px,transparent 1px 24.6px);
-  padding-bottom:0;
-}
-.bar{
-  position:relative;height:100%;display:flex;flex-direction:column;justify-content:flex-end;
-  border-bottom:1.5px solid var(--rule);
-}
-.bar-fill{
-  width:100%;background:linear-gradient(180deg,var(--teal-dim),var(--teal));min-height:2px;height:0;
-  transition:height .28s cubic-bezier(.2,.7,.3,1);
-  border-radius:3px 3px 0 0;
-}
-.bar.empty .bar-fill{background:var(--rule)}
-.bar.today .bar-fill{background:var(--ink)}
-.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:7px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
 .day{
   font-size:12px;text-align:center;color:var(--muted);padding:5px 0;border-radius:8px;
   min-height:32px;transition:background .15s,color .15s;
@@ -172,6 +151,18 @@ button{background:none;border:0;padding:0;cursor:pointer}
 }
 .page-head h1{font-size:19px;font-weight:600;margin:0;letter-spacing:.01em}
 .link{font-size:14px;color:var(--teal);font-weight:500}
+
+.filterbar{
+  display:flex;gap:8px;padding:12px var(--pad);overflow-x:auto;
+  background:var(--surface);border-bottom:1px solid var(--rule);
+}
+.filterbar::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;min-height:32px;padding:0 14px;border-radius:999px;
+  background:var(--paper);color:var(--muted);font-size:13px;font-weight:600;
+  border:1px solid var(--rule-soft);white-space:nowrap;transition:background .15s,color .15s;
+}
+.chip.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
 
 /* ---------- tabbar ---------- */
 .tabs{
@@ -262,11 +253,6 @@ button{background:none;border:0;padding:0;cursor:pointer}
   <!-- TODAY -->
   <section class="view on" id="v-today">
     <div class="week">
-      <div class="week-head">
-        <div class="week-title" id="weekTitle">This week</div>
-        <div class="week-sub" id="weekSub"></div>
-      </div>
-      <div class="bars" id="bars"></div>
       <div class="days" id="daysRow"></div>
     </div>
     <div id="todayList"></div>
@@ -278,6 +264,7 @@ button{background:none;border:0;padding:0;cursor:pointer}
       <h1>Library</h1>
       <button class="link" id="addCatBtn">Add category</button>
     </div>
+    <div class="filterbar" id="libFilterBar"></div>
     <div id="libList"></div>
     <div style="padding:22px var(--pad) 8px">
       <button class="btn wide" id="addExBtn">Add exercise</button>
@@ -352,6 +339,7 @@ const KEY = "bodylog.v1";
 const DAY_ABBR = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const HISTORY_DAYS = 84;
+const MUSCLES = ["Neck","Chest","Shoulders","Biceps/Triceps","Forearms","Hands & wrists","Fingers","Abs","Hips","Legs","Knees"];
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 
@@ -391,6 +379,7 @@ function defaultState(){
 let state;
 let selectedDate = iso(new Date());
 let mode = "workout";
+let libFilter = "";
 
 function load(){
   try {
@@ -460,33 +449,15 @@ function toast(msg){
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove("on"), 2000);
 }
-function doseLine(ex){
-  const bits = [];
-  if(ex.dose) bits.push(ex.dose);
-  if(ex.target) bits.push(ex.target);
-  return bits.join(" · ");
-}
 
 /* ============ TODAY ============ */
 function renderWeek(){
   const ws = state.weekStart;
-  const bars = document.getElementById("bars");
   const daysRow = document.getElementById("daysRow");
-  bars.innerHTML = ""; daysRow.innerHTML = "";
+  daysRow.innerHTML = "";
   const todayStr = iso(new Date());
 
-  let wDone = 0, wTotal = 0;
   weekDates(ws).forEach((d, i) => {
-    const s = dayStats(d);
-    wDone += s.done; wTotal += s.total;
-    const pct = s.total ? s.done / s.total : 0;
-
-    const bar = el("div","bar" + (s.total===0 ? " empty" : "") + (d===todayStr ? " today" : ""));
-    const fill = el("div","bar-fill");
-    fill.style.height = s.total ? Math.max(pct*100, 3) + "%" : "3px";
-    bar.appendChild(fill);
-    bars.appendChild(bar);
-
     const btn = el("button","day" + (d===todayStr ? " today" : "") + (d===selectedDate ? " sel" : ""));
     const b = el("b", null, DAY_ABBR[i][0]);
     const sp = el("span", null, String(parseISO(d).getDate()));
@@ -495,11 +466,6 @@ function renderWeek(){
     btn.onclick = () => { selectedDate = d; renderToday(); };
     daysRow.appendChild(btn);
   });
-
-  document.getElementById("weekTitle").textContent =
-    "Week of " + fmtShort(ws);
-  document.getElementById("weekSub").textContent =
-    wTotal ? wDone + " of " + wTotal + " done" : "Nothing scheduled";
 }
 
 function renderToday(){
@@ -531,22 +497,13 @@ function renderToday(){
     return;
   }
 
+  const ordered = [];
   state.categories.forEach(cat => {
-    const items = list.filter(ex => ex.cat === cat.id);
-    if(!items.length) return;
-    const g = el("div","group");
-    const gh = el("div","group-head");
-    const gn = el("div","group-name");
-    bidi(gn, cat.name);
-    const gl = el("div","group-line");
-    const day = state.log[selectedDate] || {};
-    const dn = items.filter(ex => day[ex.id] && day[ex.id].done).length;
-    const gc = el("div","group-count", dn + "/" + items.length);
-    gh.appendChild(gn); gh.appendChild(gl); gh.appendChild(gc);
-    g.appendChild(gh);
-    items.forEach(ex => g.appendChild(exRow(ex)));
-    wrap.appendChild(g);
+    list.filter(ex => ex.cat === cat.id).forEach(ex => ordered.push(ex));
   });
+  const g = el("div","group");
+  ordered.forEach(ex => g.appendChild(exRow(ex)));
+  wrap.appendChild(g);
 }
 
 const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#F6F8F3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>';
@@ -566,12 +523,6 @@ function exRow(ex){
   const name = el("div","row-name");
   bidi(name, ex.name);
   main.appendChild(name);
-  const meta = doseLine(ex);
-  if(meta){
-    const m = el("div","row-meta");
-    bidi(m, meta);
-    main.appendChild(m);
-  }
   row.appendChild(main);
 
   if(ex.track){
@@ -611,16 +562,40 @@ function setEntry(exId, patch){
 }
 
 /* ============ LIBRARY ============ */
+function renderLibFilter(){
+  const bar = document.getElementById("libFilterBar");
+  const used = MUSCLES.filter(m => state.exercises.some(ex => ex.target === m));
+  if(libFilter && !used.includes(libFilter)) libFilter = "";
+  bar.innerHTML = "";
+  if(!used.length){ bar.style.display = "none"; return; }
+  bar.style.display = "flex";
+  const allChip = el("button","chip" + (libFilter === "" ? " on" : ""), "All");
+  allChip.onclick = () => { libFilter = ""; renderLib(); };
+  bar.appendChild(allChip);
+  used.forEach(m => {
+    const c = el("button","chip" + (libFilter === m ? " on" : ""), m);
+    c.onclick = () => { libFilter = (libFilter === m ? "" : m); renderLib(); };
+    bar.appendChild(c);
+  });
+}
+
 function renderLib(){
+  renderLibFilter();
   const wrap = document.getElementById("libList");
   wrap.innerHTML = "";
   if(!state.exercises.length){
     const e = el("div","empty-state");
     e.appendChild(el("p", null, "Your library is empty. Add exercises in English or Arabic — both work."));
     wrap.appendChild(e);
+    return;
   }
+  let shown = 0;
   state.categories.forEach(cat => {
-    const items = state.exercises.filter(ex => ex.cat === cat.id);
+    const all = state.exercises.filter(ex => ex.cat === cat.id);
+    const items = libFilter ? all.filter(ex => ex.target === libFilter) : all;
+    if(libFilter && !items.length) return;
+    shown += items.length;
+
     const g = el("div","group");
     const gh = el("div","group-head");
     const gn = el("div","group-name");
@@ -666,6 +641,9 @@ function renderLib(){
     });
     wrap.appendChild(g);
   });
+  if(libFilter && !shown){
+    wrap.appendChild(el("div","empty-state","No exercises target " + libFilter + " yet."));
+  }
 }
 
 /* ============ sheets ============ */
@@ -723,8 +701,18 @@ function openExSheet(ex){
     const doseI = textInput(draft.dose, "3 × 12 / 30s");
     body.appendChild(makeField("Sets / reps / time", doseI));
 
-    const targetI = textInput(draft.target, "neck, glutes, wrists …");
-    body.appendChild(makeField("What it targets (optional)", targetI));
+    const targetS = document.createElement("select");
+    const noneO = document.createElement("option");
+    noneO.value = ""; noneO.textContent = "—";
+    if(!draft.target) noneO.selected = true;
+    targetS.appendChild(noneO);
+    MUSCLES.forEach(m => {
+      const o = document.createElement("option");
+      o.value = m; o.textContent = m;
+      if(m === draft.target) o.selected = true;
+      targetS.appendChild(o);
+    });
+    body.appendChild(makeField("What it targets (optional)", targetS));
 
     const dp = el("div","daypick");
     DAY_ABBR.forEach((d, i) => {
@@ -773,7 +761,7 @@ function openExSheet(ex){
       if(!draft.days.length){ toast("Pick at least one day"); return; }
       const rec = {
         id: draft.id, cat: catS.value, name: name,
-        target: targetI.value.trim(), dose: doseI.value.trim(),
+        target: targetS.value, dose: doseI.value.trim(),
         days: draft.days.slice().sort(), track: cb.checked, unit: unitS.value
       };
       const idx = state.exercises.findIndex(e => e.id === rec.id);
