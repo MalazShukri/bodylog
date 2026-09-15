@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12211F">
+<title>Body Log</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12211F;
+  --paper:#EDF0EA;
+  --surface:#F6F8F3;
+  --rule:#CBD2C6;
+  --rule-soft:#DEE3D9;
+  --teal:#1F6F63;
+  --teal-dim:#2E8576;
+  --amber:#B0821A;
+  --muted:#65756D;
+  --danger:#973524;
+  --r:10px;
+  --tap:52px;
+  --pad:18px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-t:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"IBM Plex Sans Arabic","Noto Sans Arabic","Segoe UI",system-ui,-apple-system,sans-serif;
+  font-size:16px;
+  line-height:1.45;
+  font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior-y:contain;
+}
+button,input,select,textarea{font:inherit;color:inherit;font-variant-numeric:tabular-nums}
+button{background:none;border:0;padding:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px;border-radius:4px}
+
+/* ---------- shell ---------- */
+#app{max-width:620px;margin:0 auto;padding-bottom:calc(76px + var(--safe-b))}
+.view{display:none}
+.view.on{display:block}
+
+/* ---------- week strip (the anchor) ---------- */
+.week{
+  padding:calc(var(--safe-t) + 14px) var(--pad) 14px;
+  background:var(--surface);
+  border-bottom:1px solid var(--rule);
+}
+.week-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.week-title{font-size:15px;font-weight:600;letter-spacing:.01em}
+.week-sub{font-size:13px;color:var(--muted)}
+.bars{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:6px;
+  height:74px;align-items:end;
+  background:
+    repeating-linear-gradient(to top,var(--rule-soft) 0 1px,transparent 1px 24.6px);
+  padding-bottom:0;
+}
+.bar{
+  position:relative;height:100%;display:flex;flex-direction:column;justify-content:flex-end;
+  border-bottom:1.5px solid var(--rule);
+}
+.bar-fill{
+  width:100%;background:var(--teal);min-height:2px;height:0;
+  transition:height .28s cubic-bezier(.2,.7,.3,1);
+  border-radius:2px 2px 0 0;
+}
+.bar.empty .bar-fill{background:var(--rule)}
+.bar.today .bar-fill{background:var(--ink)}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:7px}
+.day{
+  font-size:12px;text-align:center;color:var(--muted);padding:5px 0;border-radius:6px;
+  min-height:32px;
+}
+.day.today{color:var(--surface);background:var(--ink);font-weight:600}
+.day.sel:not(.today){background:var(--rule-soft);color:var(--ink);font-weight:600}
+.day b{display:block;font-size:13px;font-weight:600;line-height:1.2}
+.day span{display:block;font-size:10.5px;opacity:.75;line-height:1.2}
+
+/* ---------- lists ---------- */
+.group{margin-top:26px}
+.group-head{
+  display:flex;align-items:center;gap:12px;padding:0 var(--pad) 8px;
+}
+.group-name{font-size:13.5px;font-weight:600;letter-spacing:.02em;white-space:nowrap}
+.group-line{flex:1;height:1px;background:var(--rule)}
+.group-count{font-size:12.5px;color:var(--muted);white-space:nowrap}
+
+.row{
+  display:flex;align-items:center;gap:13px;width:100%;text-align:start;
+  min-height:var(--tap);padding:9px var(--pad);
+  border-bottom:1px solid var(--rule-soft);
+  background:transparent;
+}
+.row:first-of-type{border-top:1px solid var(--rule-soft)}
+.row:active{background:var(--surface)}
+.box{
+  flex:0 0 auto;width:23px;height:23px;border:1.5px solid var(--rule);border-radius:6px;
+  display:grid;place-items:center;background:var(--surface);
+}
+.box svg{width:14px;height:14px;opacity:0;transform:scale(.6);transition:opacity .15s,transform .15s}
+.row.done .box{background:var(--teal);border-color:var(--teal)}
+.row.done .box svg{opacity:1;transform:scale(1)}
+.row-main{flex:1;min-width:0}
+.row-name{font-size:15.5px;line-height:1.3;word-break:break-word}
+.row.done .row-name{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
+.row-meta{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.3;word-break:break-word}
+.val{
+  flex:0 0 auto;display:flex;align-items:center;gap:4px;
+  border:1px solid var(--rule);border-radius:8px;background:var(--surface);
+  padding:4px 7px;
+}
+.val input{
+  width:46px;border:0;background:transparent;text-align:center;font-size:15px;font-weight:600;
+  padding:2px 0;-moz-appearance:textfield;
+}
+.val input::-webkit-outer-spin-button,.val input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.val span{font-size:11px;color:var(--muted)}
+.pb{color:var(--amber);font-weight:600}
+
+/* ---------- misc ---------- */
+.empty-state{padding:44px var(--pad);text-align:center;color:var(--muted);font-size:14.5px}
+.empty-state p{margin:0 0 16px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:46px;padding:0 20px;border-radius:var(--r);
+  background:var(--ink);color:var(--surface);font-size:15px;font-weight:500;
+}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--rule)}
+.btn.danger{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.btn.wide{width:100%}
+.btn:active{opacity:.8}
+
+.page-head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:calc(var(--safe-t) + 18px) var(--pad) 14px;
+  background:var(--surface);border-bottom:1px solid var(--rule);
+}
+.page-head h1{font-size:19px;font-weight:600;margin:0;letter-spacing:.01em}
+.link{font-size:14px;color:var(--teal);font-weight:500}
+
+/* ---------- tabbar ---------- */
+.tabs{
+  position:fixed;left:0;right:0;bottom:0;z-index:40;
+  display:grid;grid-template-columns:repeat(3,1fr);
+  background:var(--surface);border-top:1px solid var(--rule);
+  padding-bottom:var(--safe-b);
+}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 8px;color:var(--muted);font-size:11.5px}
+.tab svg{width:21px;height:21px}
+.tab.on{color:var(--ink);font-weight:600}
+
+/* ---------- sheet ---------- */
+.scrim{position:fixed;inset:0;background:rgba(18,33,31,.42);z-index:50;display:none}
+.scrim.on{display:block}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:51;
+  max-width:620px;margin:0 auto;max-height:92vh;overflow-y:auto;
+  background:var(--paper);border-radius:16px 16px 0 0;
+  padding:8px var(--pad) calc(24px + var(--safe-b));
+  display:none;
+}
+.sheet.on{display:block}
+.grab{width:38px;height:4px;border-radius:2px;background:var(--rule);margin:8px auto 14px}
+.sheet h2{font-size:17px;font-weight:600;margin:0 0 18px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+.field input[type=text],.field select,.field textarea{
+  width:100%;min-height:46px;padding:10px 12px;
+  border:1px solid var(--rule);border-radius:var(--r);background:var(--surface);
+}
+.field textarea{min-height:64px;resize:vertical}
+.daypick{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.daypick button{
+  min-height:44px;border:1px solid var(--rule);border-radius:8px;background:var(--surface);
+  font-size:13px;color:var(--muted);
+}
+.daypick button.on{background:var(--ink);color:var(--surface);border-color:var(--ink);font-weight:600}
+.checkline{display:flex;align-items:center;gap:10px;min-height:46px}
+.checkline input{width:20px;height:20px;accent-color:var(--teal)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sheet-actions{display:flex;gap:10px;margin-top:22px}
+.sheet-actions .btn{flex:1}
+
+/* ---------- progress ---------- */
+.hist{padding:22px var(--pad) 0}
+.hbar{display:flex;align-items:center;gap:11px;min-height:34px}
+.hbar-label{font-size:12px;color:var(--muted);width:52px;flex:0 0 auto}
+.hbar-track{flex:1;height:9px;background:var(--rule-soft);border-radius:5px;overflow:hidden}
+.hbar-fill{height:100%;background:var(--teal);border-radius:5px}
+.hbar-pct{font-size:12px;color:var(--muted);width:40px;text-align:end;flex:0 0 auto}
+.hbar.current .hbar-fill{background:var(--ink)}
+.hbar.current .hbar-label{color:var(--ink);font-weight:600}
+.pbrow{display:flex;align-items:baseline;gap:12px;padding:11px var(--pad);border-bottom:1px solid var(--rule-soft)}
+.pbrow .n{flex:1;font-size:15px;min-width:0;word-break:break-word}
+.pbrow .v{font-size:15px;font-weight:600;color:var(--amber);white-space:nowrap}
+.pbrow .d{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.note{padding:16px var(--pad);font-size:12.5px;color:var(--muted);line-height:1.5}
+
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:calc(90px + var(--safe-b));z-index:60;
+  background:var(--ink);color:var(--surface);padding:11px 18px;border-radius:22px;font-size:14px;
+  opacity:0;pointer-events:none;transition:opacity .2s;max-width:88vw;text-align:center;
+}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- TODAY -->
+  <section class="view on" id="v-today">
+    <div class="week">
+      <div class="week-head">
+        <div class="week-title" id="weekTitle">This week</div>
+        <div class="week-sub" id="weekSub"></div>
+      </div>
+      <div class="bars" id="bars"></div>
+      <div class="days" id="daysRow"></div>
+    </div>
+    <div id="todayList"></div>
+  </section>
+
+  <!-- LIBRARY -->
+  <section class="view" id="v-lib">
+    <div class="page-head">
+      <h1>Library</h1>
+      <button class="link" id="addCatBtn">Add category</button>
+    </div>
+    <div id="libList"></div>
+    <div style="padding:22px var(--pad) 8px">
+      <button class="btn wide" id="addExBtn">Add exercise</button>
+    </div>
+  </section>
+
+  <!-- PROGRESS -->
+  <section class="view" id="v-prog">
+    <div class="page-head">
+      <h1>Progress</h1>
+      <button class="link" id="dataBtn">Data</button>
+    </div>
+    <div id="progBody"></div>
+  </section>
+
+</div>
+
+<nav class="tabs">
+  <button class="tab on" data-view="today">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4M8.5 14.5l2.2 2.2 4.3-4.6"/></svg>
+    Today
+  </button>
+  <button class="tab" data-view="lib">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h10"/><circle cx="19" cy="19" r="2.6"/></svg>
+    Library
+  </button>
+  <button class="tab" data-view="prog">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+    Progress
+  </button>
+</nav>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet"><div class="grab"></div><div id="sheetBody"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ============ storage ============ */
+const KEY = "bodylog.v1";
+const DAY_ABBR = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const HISTORY_WEEKS = 12;
+
+const uid = () => Math.random().toString(36).slice(2, 9);
+
+function iso(d){
+  const p = n => String(n).padStart(2,"0");
+  return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate());
+}
+function parseISO(s){ const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); }
+function sundayOf(date){
+  const x = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  x.setDate(x.getDate() - x.getDay());
+  return iso(x);
+}
+function addDays(isoStr, n){ const d = parseISO(isoStr); d.setDate(d.getDate()+n); return iso(d); }
+function weekDates(ws){ return Array.from({length:7}, (_,i) => addDays(ws, i)); }
+function fmtShort(isoStr){ const d = parseISO(isoStr); return d.getDate()+" "+MONTHS[d.getMonth()]; }
+
+function defaultState(){
+  const ws = sundayOf(new Date());
+  return {
+    v: 1,
+    weekStart: ws,
+    categories: [
+      { id: uid(), name: "Stretching & Mobility" },
+      { id: uid(), name: "Posture" },
+      { id: uid(), name: "Calisthenics" },
+      { id: uid(), name: "Grip & Forearms" },
+      { id: uid(), name: "Punching Power" }
+    ],
+    exercises: [],
+    log: {},
+    history: [],
+    pbs: {}
+  };
+}
+
+let state;
+let selectedDate = iso(new Date());
+
+function load(){
+  try {
+    const raw = localStorage.getItem(KEY);
+    state = raw ? JSON.parse(raw) : defaultState();
+  } catch(e){ state = defaultState(); }
+  if(!state || !state.categories) state = defaultState();
+  state.exercises = state.exercises || [];
+  state.log = state.log || {};
+  state.history = state.history || [];
+  state.pbs = state.pbs || {};
+  rollover();
+}
+function save(){
+  try { localStorage.setItem(KEY, JSON.stringify(state)); }
+  catch(e){ toast("Storage full — export a backup"); }
+}
+
+/* ============ weekly rollover ============ */
+function scheduledOn(dateStr){
+  const dow = parseISO(dateStr).getDay();
+  return state.exercises.filter(ex => ex.days.includes(dow));
+}
+function dayStats(dateStr){
+  const list = scheduledOn(dateStr);
+  const day = state.log[dateStr] || {};
+  const done = list.filter(ex => day[ex.id] && day[ex.id].done).length;
+  return { done, total: list.length };
+}
+function summarizeWeek(ws){
+  const cats = {};
+  state.categories.forEach(c => cats[c.id] = { done:0, total:0 });
+  let done = 0, total = 0;
+  weekDates(ws).forEach(d => {
+    const day = state.log[d] || {};
+    scheduledOn(d).forEach(ex => {
+      total++;
+      if(cats[ex.cat]) cats[ex.cat].total++;
+      if(day[ex.id] && day[ex.id].done){
+        done++;
+        if(cats[ex.cat]) cats[ex.cat].done++;
+      }
+    });
+  });
+  return { weekStart: ws, cats, done, total };
+}
+function rollover(){
+  const cur = sundayOf(new Date());
+  if(state.weekStart === cur) return;
+  const past = summarizeWeek(state.weekStart);
+  if(past.total > 0 || past.done > 0){
+    state.history = state.history.filter(h => h.weekStart !== past.weekStart);
+    state.history.push(past);
+    state.history.sort((a,b) => a.weekStart < b.weekStart ? -1 : 1);
+    if(state.history.length > HISTORY_WEEKS) state.history = state.history.slice(-HISTORY_WEEKS);
+  }
+  const keep = new Set(weekDates(cur));
+  Object.keys(state.log).forEach(d => { if(!keep.has(d)) delete state.log[d]; });
+  state.weekStart = cur;
+  save();
+}
+
+/* ============ helpers ============ */
+function el(tag, cls, text){
+  const n = document.createElement(tag);
+  if(cls) n.className = cls;
+  if(text !== undefined && text !== null) n.textContent = text;
+  return n;
+}
+function bidi(node, text){
+  node.textContent = text;
+  node.setAttribute("dir","auto");
+  node.style.textAlign = "start";
+  return node;
+}
+let toastTimer;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("on");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("on"), 2000);
+}
+function catName(id){
+  const c = state.categories.find(c => c.id === id);
+  return c ? c.name : "—";
+}
+function doseLine(ex){
+  const bits = [];
+  if(ex.dose) bits.push(ex.dose);
+  if(ex.target) bits.push(ex.target);
+  return bits.join(" · ");
+}
+
+/* ============ TODAY ============ */
+function renderWeek(){
+  const ws = state.weekStart;
+  const bars = document.getElementById("bars");
+  const daysRow = document.getElementById("daysRow");
+  bars.innerHTML = ""; daysRow.innerHTML = "";
+  const todayStr = iso(new Date());
+
+  let wDone = 0, wTotal = 0;
+  weekDates(ws).forEach((d, i) => {
+    const s = dayStats(d);
+    wDone += s.done; wTotal += s.total;
+    const pct = s.total ? s.done / s.total : 0;
+
+    const bar = el("div","bar" + (s.total===0 ? " empty" : "") + (d===todayStr ? " today" : ""));
+    const fill = el("div","bar-fill");
+    fill.style.height = s.total ? Math.max(pct*100, 3) + "%" : "3px";
+    bar.appendChild(fill);
+    bars.appendChild(bar);
+
+    const btn = el("button","day" + (d===todayStr ? " today" : "") + (d===selectedDate ? " sel" : ""));
+    const b = el("b", null, DAY_ABBR[i][0]);
+    const sp = el("span", null, String(parseISO(d).getDate()));
+    btn.appendChild(b); btn.appendChild(sp);
+    btn.setAttribute("aria-label", DAY_ABBR[i] + " " + fmtShort(d));
+    btn.onclick = () => { selectedDate = d; renderToday(); };
+    daysRow.appendChild(btn);
+  });
+
+  document.getElementById("weekTitle").textContent =
+    "Week of " + fmtShort(ws);
+  document.getElementById("weekSub").textContent =
+    wTotal ? wDone + " of " + wTotal + " done" : "Nothing scheduled";
+}
+
+function renderToday(){
+  renderWeek();
+  const wrap = document.getElementById("todayList");
+  wrap.innerHTML = "";
+
+  const d = parseISO(selectedDate);
+  const isToday = selectedDate === iso(new Date());
+  const head = el("div","group-head");
+  head.style.paddingTop = "22px";
+  const nm = el("div","group-name", (isToday ? "Today · " : "") + DAY_ABBR[d.getDay()] + " " + fmtShort(selectedDate));
+  const ln = el("div","group-line");
+  const st = dayStats(selectedDate);
+  const ct = el("div","group-count", st.total ? st.done + "/" + st.total : "");
+  head.appendChild(nm); head.appendChild(ln); head.appendChild(ct);
+  wrap.appendChild(head);
+
+  const list = scheduledOn(selectedDate);
+  if(!list.length){
+    const e = el("div","empty-state");
+    const p = el("p", null, state.exercises.length
+      ? "Nothing scheduled for this day."
+      : "No exercises yet. Add your own in Library.");
+    const b = el("button","btn ghost", state.exercises.length ? "Open Library" : "Add first exercise");
+    b.onclick = () => { switchView("lib"); if(!state.exercises.length) openExSheet(null); };
+    e.appendChild(p); e.appendChild(b);
+    wrap.appendChild(e);
+    return;
+  }
+
+  state.categories.forEach(cat => {
+    const items = list.filter(ex => ex.cat === cat.id);
+    if(!items.length) return;
+    const g = el("div","group");
+    const gh = el("div","group-head");
+    const gn = el("div","group-name");
+    bidi(gn, cat.name);
+    const gl = el("div","group-line");
+    const day = state.log[selectedDate] || {};
+    const dn = items.filter(ex => day[ex.id] && day[ex.id].done).length;
+    const gc = el("div","group-count", dn + "/" + items.length);
+    gh.appendChild(gn); gh.appendChild(gl); gh.appendChild(gc);
+    g.appendChild(gh);
+    items.forEach(ex => g.appendChild(exRow(ex)));
+    wrap.appendChild(g);
+  });
+}
+
+const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#F6F8F3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>';
+
+function exRow(ex){
+  const day = state.log[selectedDate] || {};
+  const entry = day[ex.id] || {};
+  const row = el("div","row" + (entry.done ? " done" : ""));
+  row.setAttribute("role","button");
+  row.tabIndex = 0;
+
+  const box = el("div","box");
+  box.innerHTML = CHECK_SVG;
+  row.appendChild(box);
+
+  const main = el("div","row-main");
+  const name = el("div","row-name");
+  bidi(name, ex.name);
+  main.appendChild(name);
+  const meta = doseLine(ex);
+  if(meta){
+    const m = el("div","row-meta");
+    bidi(m, meta);
+    main.appendChild(m);
+  }
+  row.appendChild(main);
+
+  if(ex.track){
+    const v = el("div","val");
+    const inp = document.createElement("input");
+    inp.type = "number";
+    inp.inputMode = "numeric";
+    inp.min = "0";
+    inp.placeholder = "0";
+    inp.value = (entry.val !== undefined && entry.val !== null) ? entry.val : "";
+    inp.setAttribute("aria-label", ex.name + " value");
+    inp.onclick = e => e.stopPropagation();
+    inp.onchange = () => {
+      const num = inp.value === "" ? null : Number(inp.value);
+      setEntry(ex.id, { val: num });
+      if(num !== null) checkPB(ex, num);
+      renderToday();
+    };
+    const u = el("span", null, ex.unit || "reps");
+    v.appendChild(inp); v.appendChild(u);
+    row.appendChild(v);
+  }
+
+  const toggle = () => {
+    setEntry(ex.id, { done: !(state.log[selectedDate] && state.log[selectedDate][ex.id] && state.log[selectedDate][ex.id].done) });
+    renderToday();
+  };
+  row.onclick = toggle;
+  row.onkeydown = e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); toggle(); } };
+  return row;
+}
+
+function setEntry(exId, patch){
+  if(!state.log[selectedDate]) state.log[selectedDate] = {};
+  const cur = state.log[selectedDate][exId] || { done:false, val:null };
+  state.log[selectedDate][exId] = Object.assign(cur, patch);
+  save();
+}
+function checkPB(ex, num){
+  const cur = state.pbs[ex.id];
+  if(!cur || num > cur.val){
+    state.pbs[ex.id] = { val:num, date:selectedDate };
+    save();
+    toast("New best: " + num + " " + (ex.unit || "reps"));
+  }
+}
+
+/* ============ LIBRARY ============ */
+function renderLib(){
+  const wrap = document.getElementById("libList");
+  wrap.innerHTML = "";
+  if(!state.exercises.length){
+    const e = el("div","empty-state");
+    e.appendChild(el("p", null, "Your library is empty. Add exercises in English or Arabic — both work."));
+    wrap.appendChild(e);
+  }
+  state.categories.forEach(cat => {
+    const items = state.exercises.filter(ex => ex.cat === cat.id);
+    const g = el("div","group");
+    const gh = el("div","group-head");
+    const gn = el("div","group-name");
+    bidi(gn, cat.name);
+    const gl = el("div","group-line");
+    const gc = el("button","group-count");
+    gc.textContent = items.length ? items.length + " · edit" : "edit";
+    gc.style.color = "var(--teal)";
+    gc.onclick = () => openCatSheet(cat);
+    gh.appendChild(gn); gh.appendChild(gl); gh.appendChild(gc);
+    g.appendChild(gh);
+
+    if(!items.length){
+      const p = el("div","note", "No exercises in this category yet.");
+      p.style.padding = "4px var(--pad) 10px";
+      g.appendChild(p);
+    }
+    items.forEach(ex => {
+      const row = el("div","row");
+      row.setAttribute("role","button");
+      row.tabIndex = 0;
+      const main = el("div","row-main");
+      const n = el("div","row-name");
+      bidi(n, ex.name);
+      main.appendChild(n);
+      const dayStr = ex.days.length === 7 ? "Every day"
+        : ex.days.length ? ex.days.slice().sort().map(d => DAY_ABBR[d]).join(" ")
+        : "Not scheduled";
+      const metaBits = [dayStr];
+      if(ex.dose) metaBits.push(ex.dose);
+      if(ex.type) metaBits.push(ex.type);
+      const m = el("div","row-meta");
+      bidi(m, metaBits.join(" · "));
+      main.appendChild(m);
+      row.appendChild(main);
+      const chev = el("div","group-count","›");
+      chev.style.fontSize = "20px";
+      row.appendChild(chev);
+      const open = () => openExSheet(ex);
+      row.onclick = open;
+      row.onkeydown = e => { if(e.key === "Enter"){ e.preventDefault(); open(); } };
+      g.appendChild(row);
+    });
+    wrap.appendChild(g);
+  });
+}
+
+/* ============ sheets ============ */
+function openSheet(build){
+  const body = document.getElementById("sheetBody");
+  body.innerHTML = "";
+  build(body);
+  document.getElementById("sheet").classList.add("on");
+  document.getElementById("scrim").classList.add("on");
+}
+function closeSheet(){
+  document.getElementById("sheet").classList.remove("on");
+  document.getElementById("scrim").classList.remove("on");
+}
+document.getElementById("scrim").onclick = closeSheet;
+
+function makeField(labelText, node){
+  const f = el("div","field");
+  const l = el("label", null, labelText);
+  f.appendChild(l); f.appendChild(node);
+  return f;
+}
+function textInput(value, placeholder){
+  const i = document.createElement("input");
+  i.type = "text";
+  i.value = value || "";
+  if(placeholder) i.placeholder = placeholder;
+  i.setAttribute("dir","auto");
+  i.style.textAlign = "start";
+  return i;
+}
+
+function openExSheet(ex){
+  const editing = !!ex;
+  const draft = editing
+    ? JSON.parse(JSON.stringify(ex))
+    : { id: uid(), cat: state.categories[0] ? state.categories[0].id : null, name:"", type:"", target:"", dose:"", days:[], track:false, unit:"reps" };
+
+  openSheet(body => {
+    body.appendChild(el("h2", null, editing ? "Edit exercise" : "New exercise"));
+
+    const nameI = textInput(draft.name, "Exercise name — English or العربية");
+    body.appendChild(makeField("Name", nameI));
+
+    const catS = document.createElement("select");
+    state.categories.forEach(c => {
+      const o = document.createElement("option");
+      o.value = c.id; o.textContent = c.name;
+      o.setAttribute("dir","auto");
+      if(c.id === draft.cat) o.selected = true;
+      catS.appendChild(o);
+    });
+    body.appendChild(makeField("Category", catS));
+
+    const two = el("div","two");
+    const typeS = document.createElement("select");
+    [["","—"],["stretch","Stretch"],["strengthen","Strengthen"],["mobility","Mobility"]].forEach(([v,t]) => {
+      const o = document.createElement("option");
+      o.value = v; o.textContent = t;
+      if(v === draft.type) o.selected = true;
+      typeS.appendChild(o);
+    });
+    const doseI = textInput(draft.dose, "3 × 12 / 30s");
+    const f1 = makeField("Type", typeS); f1.style.marginBottom = "0";
+    const f2 = makeField("Sets / reps / time", doseI); f2.style.marginBottom = "0";
+    two.appendChild(f1); two.appendChild(f2);
+    const twoWrap = el("div","field"); twoWrap.appendChild(two);
+    body.appendChild(twoWrap);
+
+    const targetI = textInput(draft.target, "neck, glutes, wrists …");
+    body.appendChild(makeField("Target area (optional)", targetI));
+
+    const dp = el("div","daypick");
+    DAY_ABBR.forEach((d, i) => {
+      const b = el("button", draft.days.includes(i) ? "on" : "", d[0]);
+      b.type = "button";
+      b.setAttribute("aria-label", d);
+      b.onclick = () => {
+        const k = draft.days.indexOf(i);
+        if(k >= 0) draft.days.splice(k,1); else draft.days.push(i);
+        b.className = draft.days.includes(i) ? "on" : "";
+      };
+      dp.appendChild(b);
+    });
+    body.appendChild(makeField("Days", dp));
+
+    const cl = el("div","checkline");
+    const cb = document.createElement("input");
+    cb.type = "checkbox"; cb.checked = !!draft.track; cb.id = "trackcb";
+    const lb = document.createElement("label");
+    lb.setAttribute("for","trackcb");
+    lb.textContent = "Log a number for this (tracks personal best)";
+    lb.style.margin = "0"; lb.style.fontSize = "14.5px"; lb.style.color = "var(--ink)";
+    cl.appendChild(cb); cl.appendChild(lb);
+    const clF = el("div","field"); clF.appendChild(cl);
+    body.appendChild(clF);
+
+    const unitS = document.createElement("select");
+    ["reps","seconds","minutes","kg","meters"].forEach(u => {
+      const o = document.createElement("option");
+      o.value = u; o.textContent = u;
+      if(u === draft.unit) o.selected = true;
+      unitS.appendChild(o);
+    });
+    const unitF = makeField("Unit", unitS);
+    unitF.style.display = draft.track ? "block" : "none";
+    cb.onchange = () => { unitF.style.display = cb.checked ? "block" : "none"; };
+    body.appendChild(unitF);
+
+    const acts = el("div","sheet-actions");
+    const cancel = el("button","btn ghost","Cancel");
+    cancel.onclick = closeSheet;
+    const savB = el("button","btn", editing ? "Save changes" : "Add exercise");
+    savB.onclick = () => {
+      const name = nameI.value.trim();
+      if(!name){ toast("Give the exercise a name"); nameI.focus(); return; }
+      if(!draft.days.length){ toast("Pick at least one day"); return; }
+      const rec = {
+        id: draft.id, cat: catS.value, name: name,
+        type: typeS.value, target: targetI.value.trim(), dose: doseI.value.trim(),
+        days: draft.days.slice().sort(), track: cb.checked, unit: unitS.value
+      };
+      const idx = state.exercises.findIndex(e => e.id === rec.id);
+      if(idx >= 0) state.exercises[idx] = rec; else state.exercises.push(rec);
+      save(); closeSheet(); renderLib(); renderToday();
+      toast(editing ? "Saved" : "Added");
+    };
+    acts.appendChild(cancel); acts.appendChild(savB);
+    body.appendChild(acts);
+
+    if(editing){
+      const del = el("button","btn danger wide","Delete exercise");
+      del.style.marginTop = "10px";
+      del.onclick = () => {
+        if(!confirm("Delete this exercise? Its logs and best are removed too.")) return;
+        state.exercises = state.exercises.filter(e => e.id !== ex.id);
+        delete state.pbs[ex.id];
+        Object.keys(state.log).forEach(d => { if(state.log[d]) delete state.log[d][ex.id]; });
+        save(); closeSheet(); renderLib(); renderToday(); renderProg();
+        toast("Deleted");
+      };
+      body.appendChild(del);
+    }
+    setTimeout(() => nameI.focus(), 60);
+  });
+}
+
+function openCatSheet(cat){
+  const editing = !!cat;
+  openSheet(body => {
+    body.appendChild(el("h2", null, editing ? "Edit category" : "New category"));
+    const nameI = textInput(editing ? cat.name : "", "Category name — English or العربية");
+    body.appendChild(makeField("Name", nameI));
+
+    const acts = el("div","sheet-actions");
+    const cancel = el("button","btn ghost","Cancel");
+    cancel.onclick = closeSheet;
+    const savB = el("button","btn", editing ? "Save changes" : "Add category");
+    savB.onclick = () => {
+      const name = nameI.value.trim();
+      if(!name){ toast("Give the category a name"); nameI.focus(); return; }
+      if(editing){
+        const c = state.categories.find(c => c.id === cat.id);
+        c.name = name;
+      } else {
+        state.categories.push({ id: uid(), name: name });
+      }
+      save(); closeSheet(); renderLib(); renderToday(); renderProg();
+      toast(editing ? "Saved" : "Added");
+    };
+    acts.appendChild(cancel); acts.appendChild(savB);
+    body.appendChild(acts);
+
+    if(editing){
+      const count = state.exercises.filter(e => e.cat === cat.id).length;
+      const del = el("button","btn danger wide","Delete category");
+      del.style.marginTop = "10px";
+      del.onclick = () => {
+        if(count){ toast("Move or delete its " + count + " exercises first"); return; }
+        if(!confirm("Delete this category?")) return;
+        state.categories = state.categories.filter(c => c.id !== cat.id);
+        save(); closeSheet(); renderLib(); renderToday(); renderProg();
+        toast("Deleted");
+      };
+      body.appendChild(del);
+    }
+  });
+}
+
+/* ============ PROGRESS ============ */
+function renderProg(){
+  const wrap = document.getElementById("progBody");
+  wrap.innerHTML = "";
+
+  const current = summarizeWeek(state.weekStart);
+  const weeks = state.history.concat([current]);
+  const real = weeks.filter(w => w.total > 0);
+
+  const h1 = el("div","group-head");
+  h1.style.paddingTop = "22px";
+  h1.appendChild(el("div","group-name","Weekly completion"));
+  h1.appendChild(el("div","group-line"));
+  wrap.appendChild(h1);
+
+  if(!real.length){
+    wrap.appendChild(el("div","empty-state","Finish a few days and your weeks show up here."));
+  } else {
+    const hist = el("div","hist");
+    real.slice(-HISTORY_WEEKS - 1).forEach(w => {
+      const pct = w.total ? Math.round(w.done / w.total * 100) : 0;
+      const isCur = w.weekStart === state.weekStart;
+      const r = el("div","hbar" + (isCur ? " current" : ""));
+      r.appendChild(el("div","hbar-label", isCur ? "Now" : fmtShort(w.weekStart)));
+      const tr = el("div","hbar-track");
+      const fl = el("div","hbar-fill");
+      fl.style.width = pct + "%";
+      tr.appendChild(fl);
+      r.appendChild(tr);
+      r.appendChild(el("div","hbar-pct", pct + "%"));
+      hist.appendChild(r);
+    });
+    wrap.appendChild(hist);
+
+    const h2 = el("div","group-head");
+    h2.style.paddingTop = "30px";
+    h2.appendChild(el("div","group-name","This week by category"));
+    h2.appendChild(el("div","group-line"));
+    wrap.appendChild(h2);
+    const catBox = el("div","hist");
+    let any = false;
+    state.categories.forEach(c => {
+      const s = current.cats[c.id];
+      if(!s || !s.total) return;
+      any = true;
+      const pct = Math.round(s.done / s.total * 100);
+      const r = el("div","hbar");
+      const lab = el("div","hbar-label");
+      lab.style.width = "auto";
+      lab.style.flex = "0 0 34%";
+      bidi(lab, c.name);
+      r.appendChild(lab);
+      const tr = el("div","hbar-track");
+      const fl = el("div","hbar-fill");
+      fl.style.width = pct + "%";
+      tr.appendChild(fl);
+      r.appendChild(tr);
+      r.appendChild(el("div","hbar-pct", pct + "%"));
+      catBox.appendChild(r);
+    });
+    if(!any) catBox.appendChild(el("div","note","Nothing scheduled this week."));
+    wrap.appendChild(catBox);
+  }
+
+  const pbIds = Object.keys(state.pbs);
+  const h3 = el("div","group-head");
+  h3.style.paddingTop = "30px";
+  h3.appendChild(el("div","group-name","Personal bests"));
+  h3.appendChild(el("div","group-line"));
+  wrap.appendChild(h3);
+  if(!pbIds.length){
+    wrap.appendChild(el("div","note","Turn on number logging for an exercise and your best is kept here for good — it survives the weekly reset."));
+  } else {
+    pbIds.forEach(id => {
+      const ex = state.exercises.find(e => e.id === id);
+      if(!ex) return;
+      const pb = state.pbs[id];
+      const r = el("div","pbrow");
+      const n = el("div","n");
+      bidi(n, ex.name);
+      r.appendChild(n);
+      r.appendChild(el("div","v", pb.val + " " + (ex.unit || "")));
+      r.appendChild(el("div","d", fmtShort(pb.date)));
+      wrap.appendChild(r);
+    });
+  }
+
+  wrap.appendChild(el("div","note","Each week starts fresh on Sunday. Daily ticks are cleared, week totals and bests are kept — the last " + HISTORY_WEEKS + " weeks."));
+}
+
+/* ============ data sheet ============ */
+function openDataSheet(){
+  openSheet(body => {
+    body.appendChild(el("h2", null, "Your data"));
+    body.appendChild(el("div","note","Everything lives on this device only. Export regularly — clearing browser data wipes it."));
+
+    const exp = el("button","btn wide","Export backup (.json)");
+    exp.style.marginBottom = "10px";
+    exp.onclick = () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type:"application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "bodylog-" + iso(new Date()) + ".json";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      toast("Backup downloaded");
+    };
+    body.appendChild(exp);
+
+    const impWrap = el("div");
+    const imp = el("button","btn ghost wide","Import backup");
+    const file = document.createElement("input");
+    file.type = "file"; file.accept = "application/json,.json"; file.style.display = "none";
+    file.onchange = () => {
+      const f = file.files[0];
+      if(!f) return;
+      const r = new FileReader();
+      r.onload = () => {
+        try {
+          const data = JSON.parse(r.result);
+          if(!data || !data.categories) throw new Error("bad file");
+          if(!confirm("Replace everything on this device with the backup?")) return;
+          state = data;
+          state.exercises = state.exercises || [];
+          state.log = state.log || {};
+          state.history = state.history || [];
+          state.pbs = state.pbs || {};
+          rollover(); save(); closeSheet();
+          renderToday(); renderLib(); renderProg();
+          toast("Backup restored");
+        } catch(e){ toast("That file isn't a Body Log backup"); }
+      };
+      r.readAsText(f);
+    };
+    imp.onclick = () => file.click();
+    impWrap.appendChild(imp); impWrap.appendChild(file);
+    impWrap.style.marginBottom = "10px";
+    body.appendChild(impWrap);
+
+    const wipe = el("button","btn danger wide","Erase everything");
+    wipe.onclick = () => {
+      if(!confirm("Erase all exercises, logs and bests on this device?")) return;
+      if(!confirm("Last chance — this cannot be undone.")) return;
+      localStorage.removeItem(KEY);
+      state = defaultState();
+      selectedDate = iso(new Date());
+      save(); closeSheet();
+      renderToday(); renderLib(); renderProg();
+      toast("Erased");
+    };
+    body.appendChild(wipe);
+  });
+}
+
+/* ============ nav ============ */
+function switchView(v){
+  document.querySelectorAll(".view").forEach(s => s.classList.remove("on"));
+  document.getElementById("v-" + v).classList.add("on");
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.dataset.view === v));
+  window.scrollTo(0, 0);
+  if(v === "today") renderToday();
+  if(v === "lib") renderLib();
+  if(v === "prog") renderProg();
+}
+document.querySelectorAll(".tab").forEach(t => { t.onclick = () => switchView(t.dataset.view); });
+document.getElementById("addExBtn").onclick = () => openExSheet(null);
+document.getElementById("addCatBtn").onclick = () => openCatSheet(null);
+document.getElementById("dataBtn").onclick = openDataSheet;
+
+document.addEventListener("visibilitychange", () => {
+  if(document.visibilityState === "visible"){
+    const t = iso(new Date());
+    if(sundayOf(new Date()) !== state.weekStart){ rollover(); }
+    if(!weekDates(state.weekStart).includes(selectedDate)) selectedDate = t;
+    renderToday();
+  }
+});
+
+/* ============ boot ============ */
+load();
+if(!weekDates(state.weekStart).includes(selectedDate)) selectedDate = iso(new Date());
+renderToday(); renderLib(); renderProg();
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
