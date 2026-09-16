@@ -118,17 +118,6 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .row-name{font-size:15.5px;line-height:1.3;word-break:break-word}
 .row.done .row-name{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
 .row-meta{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.3;word-break:break-word}
-.val{
-  flex:0 0 auto;display:flex;align-items:center;gap:4px;
-  border:1px solid var(--rule);border-radius:8px;background:var(--surface);
-  padding:4px 7px;
-}
-.val input{
-  width:46px;border:0;background:transparent;text-align:center;font-size:15px;font-weight:600;
-  padding:2px 0;-moz-appearance:textfield;
-}
-.val input::-webkit-outer-spin-button,.val input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.val span{font-size:11px;color:var(--muted)}
 
 /* ---------- misc ---------- */
 .empty-state{padding:44px var(--pad);text-align:center;color:var(--muted);font-size:14.5px}
@@ -525,26 +514,6 @@ function exRow(ex){
   main.appendChild(name);
   row.appendChild(main);
 
-  if(ex.track){
-    const v = el("div","val");
-    const inp = document.createElement("input");
-    inp.type = "number";
-    inp.inputMode = "numeric";
-    inp.min = "0";
-    inp.placeholder = "0";
-    inp.value = (entry.val !== undefined && entry.val !== null) ? entry.val : "";
-    inp.setAttribute("aria-label", ex.name + " value");
-    inp.onclick = e => e.stopPropagation();
-    inp.onchange = () => {
-      const num = inp.value === "" ? null : Number(inp.value);
-      setEntry(ex.id, { val: num });
-      renderToday();
-    };
-    const u = el("span", null, ex.unit || "reps");
-    v.appendChild(inp); v.appendChild(u);
-    row.appendChild(v);
-  }
-
   const toggle = () => {
     setEntry(ex.id, { done: !(state.log[selectedDate] && state.log[selectedDate][ex.id] && state.log[selectedDate][ex.id].done) });
     renderToday();
@@ -680,7 +649,7 @@ function openExSheet(ex){
   const editing = !!ex;
   const draft = editing
     ? JSON.parse(JSON.stringify(ex))
-    : { id: uid(), cat: state.categories[0] ? state.categories[0].id : null, name:"", target:"", dose:"", days:[], track:false, unit:"reps" };
+    : { id: uid(), cat: state.categories[0] ? state.categories[0].id : null, name:"", target:"", dose:"", days:[] };
 
   openSheet(body => {
     body.appendChild(el("h2", null, editing ? "Edit exercise" : "New exercise"));
@@ -728,29 +697,6 @@ function openExSheet(ex){
     });
     body.appendChild(makeField("Days", dp));
 
-    const cl = el("div","checkline");
-    const cb = document.createElement("input");
-    cb.type = "checkbox"; cb.checked = !!draft.track; cb.id = "trackcb";
-    const lb = document.createElement("label");
-    lb.setAttribute("for","trackcb");
-    lb.textContent = "Log a number for this";
-    lb.style.margin = "0"; lb.style.fontSize = "14.5px"; lb.style.color = "var(--ink)";
-    cl.appendChild(cb); cl.appendChild(lb);
-    const clF = el("div","field"); clF.appendChild(cl);
-    body.appendChild(clF);
-
-    const unitS = document.createElement("select");
-    ["reps","seconds","minutes","kg","meters"].forEach(u => {
-      const o = document.createElement("option");
-      o.value = u; o.textContent = u;
-      if(u === draft.unit) o.selected = true;
-      unitS.appendChild(o);
-    });
-    const unitF = makeField("Unit", unitS);
-    unitF.style.display = draft.track ? "block" : "none";
-    cb.onchange = () => { unitF.style.display = cb.checked ? "block" : "none"; };
-    body.appendChild(unitF);
-
     const acts = el("div","sheet-actions");
     const cancel = el("button","btn ghost","Cancel");
     cancel.onclick = closeSheet;
@@ -762,7 +708,7 @@ function openExSheet(ex){
       const rec = {
         id: draft.id, cat: catS.value, name: name,
         target: targetS.value, dose: doseI.value.trim(),
-        days: draft.days.slice().sort(), track: cb.checked, unit: unitS.value
+        days: draft.days.slice().sort()
       };
       const idx = state.exercises.findIndex(e => e.id === rec.id);
       if(idx >= 0) state.exercises[idx] = rec; else state.exercises.push(rec);
