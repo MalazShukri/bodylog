@@ -1,7 +1,9 @@
 # Body Log
 
 Single-page PWA for tracking body work. No build step, no framework, no backend, no cost.
-All data lives in `localStorage` on the device.
+All data lives in `localStorage` on the device — each device keeps its own copy (see
+Backups below for moving data between them). The interface follows the device's light/dark
+setting automatically.
 
 ## Files
 
