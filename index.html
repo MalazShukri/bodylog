@@ -412,14 +412,20 @@ function save(){
 /* ============ rollover / retention ============ */
 function pruneOld(){
   const cutoff = addDays(iso(new Date()), -HISTORY_DAYS);
-  Object.keys(state.log).forEach(d => { if(d < cutoff) delete state.log[d]; });
-  Object.keys(state.taskLog).forEach(d => { if(d < cutoff) delete state.taskLog[d]; });
-  state.tasks = state.tasks.filter(t => t.pinned || t.date >= cutoff);
+  let dirty = false;
+  Object.keys(state.log).forEach(d => { if(d < cutoff){ delete state.log[d]; dirty = true; } });
+  Object.keys(state.taskLog).forEach(d => { if(d < cutoff){ delete state.taskLog[d]; dirty = true; } });
+  const keptTasks = state.tasks.filter(t => t.pinned || t.date >= cutoff);
+  if(keptTasks.length !== state.tasks.length) dirty = true;
+  state.tasks = keptTasks;
+  return dirty;
 }
 function rollover(){
-  state.weekStart = sundayOf(new Date());
-  pruneOld();
-  save();
+  const cur = sundayOf(new Date());
+  let dirty = state.weekStart !== cur;
+  state.weekStart = cur;
+  if(pruneOld()) dirty = true;
+  if(dirty) save();
 }
 
 /* ============ scheduling ============ */
