@@ -346,7 +346,7 @@ const KEY = "bodylog.v1";
 const DAY_ABBR = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const HISTORY_DAYS = 84;
-const MUSCLES = ["Neck","Chest","Shoulders","Biceps/Triceps","Forearms","Hands & wrists","Fingers","Abs","Hips","Legs","Knees"];
+const DEFAULT_MUSCLES = ["Neck","Chest","Shoulders","Biceps/Triceps","Forearms","Hands & wrists","Fingers","Abs","Hips","Legs","Knees"];
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 
@@ -379,7 +379,8 @@ function defaultState(){
     exercises: [],
     log: {},
     tasks: [],
-    taskLog: {}
+    taskLog: {},
+    muscles: DEFAULT_MUSCLES.slice()
   };
 }
 
@@ -398,6 +399,7 @@ function load(){
   state.log = state.log || {};
   state.tasks = state.tasks || [];
   state.taskLog = state.taskLog || {};
+  state.muscles = (state.muscles && state.muscles.length) ? state.muscles : DEFAULT_MUSCLES.slice();
   delete state.history;
   delete state.pbs;
   rollover();
@@ -551,7 +553,7 @@ function setEntry(exId, patch){
 /* ============ LIBRARY ============ */
 function renderLibFilter(){
   const bar = document.getElementById("libFilterBar");
-  const used = MUSCLES.filter(m => state.exercises.some(ex => ex.target === m));
+  const used = state.muscles.filter(m => state.exercises.some(ex => ex.target === m));
   if(libFilter && !used.includes(libFilter)) libFilter = "";
   bar.innerHTML = "";
   if(!used.length){ bar.style.display = "none"; return; }
@@ -689,17 +691,61 @@ function openExSheet(ex){
     body.appendChild(makeField("Sets / reps / time", doseI));
 
     const targetS = document.createElement("select");
-    const noneO = document.createElement("option");
-    noneO.value = ""; noneO.textContent = "—";
-    if(!draft.target) noneO.selected = true;
-    targetS.appendChild(noneO);
-    MUSCLES.forEach(m => {
-      const o = document.createElement("option");
-      o.value = m; o.textContent = m;
-      if(m === draft.target) o.selected = true;
-      targetS.appendChild(o);
-    });
-    body.appendChild(makeField("What it targets (optional)", targetS));
+    function fillTargetOptions(selected){
+      targetS.innerHTML = "";
+      const noneO = document.createElement("option");
+      noneO.value = ""; noneO.textContent = "—";
+      if(!selected) noneO.selected = true;
+      targetS.appendChild(noneO);
+      state.muscles.forEach(m => {
+        const o = document.createElement("option");
+        o.value = m; o.textContent = m;
+        if(m === selected) o.selected = true;
+        targetS.appendChild(o);
+      });
+    }
+    fillTargetOptions(draft.target);
+
+    const targetF = makeField("What it targets (optional)", targetS);
+
+    const addTargetLink = el("button","link","+ Add new target");
+    addTargetLink.type = "button";
+    addTargetLink.style.display = "block";
+    addTargetLink.style.marginTop = "8px";
+    targetF.appendChild(addTargetLink);
+
+    const newTargetRow = el("div","two");
+    newTargetRow.style.display = "none";
+    newTargetRow.style.marginTop = "8px";
+    const newTargetI = textInput("", "e.g. Calves");
+    const newTargetAdd = el("button","btn ghost","Add");
+    newTargetAdd.type = "button";
+    newTargetRow.appendChild(newTargetI);
+    newTargetRow.appendChild(newTargetAdd);
+    targetF.appendChild(newTargetRow);
+
+    addTargetLink.onclick = () => {
+      const show = newTargetRow.style.display === "none";
+      newTargetRow.style.display = show ? "grid" : "none";
+      if(show) setTimeout(() => newTargetI.focus(), 30);
+    };
+    const commitNewTarget = () => {
+      const name = newTargetI.value.trim();
+      if(!name) return;
+      const existing = state.muscles.find(m => m.toLowerCase() === name.toLowerCase());
+      if(!existing){
+        state.muscles.push(name);
+        save();
+      }
+      fillTargetOptions(existing || name);
+      newTargetI.value = "";
+      newTargetRow.style.display = "none";
+      toast(existing ? "Already in the list" : "Added");
+    };
+    newTargetAdd.onclick = commitNewTarget;
+    newTargetI.onkeydown = e => { if(e.key === "Enter"){ e.preventDefault(); commitNewTarget(); } };
+
+    body.appendChild(targetF);
 
     const dp = el("div","daypick");
     DAY_ABBR.forEach((d, i) => {
@@ -1035,6 +1081,7 @@ function openDataSheet(){
           state.log = state.log || {};
           state.tasks = state.tasks || [];
           state.taskLog = state.taskLog || {};
+          state.muscles = (state.muscles && state.muscles.length) ? state.muscles : DEFAULT_MUSCLES.slice();
           delete state.history;
           delete state.pbs;
           rollover(); save(); closeSheet();

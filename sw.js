@@ -1,4 +1,4 @@
-const CACHE = "bodylog-v6";
+const CACHE = "bodylog-v7";
 const ASSETS = [
   "./",
   "./index.html",

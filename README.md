@@ -48,8 +48,10 @@ The app has two modes, switched with the pill control at the top: **Workout** an
 - **Today** — a compact Sunday-anchored day strip at the top to switch days, then a flat
   checklist of that day's exercises. Tap a row to mark it done.
 - **Library** — add, edit, delete exercises and categories. Every exercise has a category,
-  an optional target muscle (picked from a fixed list) and dose, and the weekdays it appears
-  on. A filter bar above the list lets you narrow it down to exercises targeting one muscle.
+  an optional target muscle and dose, and the weekdays it appears on. The target list starts
+  with a set of common muscle groups; "+ Add new target" in the exercise sheet lets you add
+  your own, which is then remembered and offered for every future exercise. A filter bar
+  above the list lets you narrow it down to exercises targeting one muscle.
 - **Progress** — a scrollable day-by-day feed: each day that had something scheduled gets a
   card listing its exercises with a ✔/✘. Tap a day to open it on Today. No weekly percentages,
   no personal-best tracking here — just what happened, per day.
@@ -85,5 +87,6 @@ the migration path if this ever moves into a real database.
 - Reset day: `sundayOf()` in `index.html` does `x.getDate() - x.getDay()`. For Monday use
   `(x.getDay() + 6) % 7`; for Saturday use `(x.getDay() + 1) % 7`.
 - Days of history kept: `HISTORY_DAYS` near the top of the script.
-- Muscle groups in "What it targets": the `MUSCLES` array near the top of the script.
+- Starting muscle groups in "What it targets": the `DEFAULT_MUSCLES` array near the top of
+  the script (only seeds new installs — more can be added from the app itself afterward).
 - After editing, bump `CACHE` in `sw.js` (e.g. `bodylog-v5`) or the old version keeps serving.
