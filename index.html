@@ -30,6 +30,7 @@
   --c5:#2E9E45;
   --c6:#D1439A;
   --display:"Big Shoulders Display","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --on-c:#FFFFFF;
   --r:10px;
   --tap:52px;
   --pad:18px;
@@ -57,6 +58,7 @@
     --c4:#9B7BFF;
     --c5:#5BD66B;
     --c6:#FF7AC6;
+    --on-c:#0F1620;
     --shadow:0 2px 10px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.3);
     --shadow-lg:0 -8px 28px rgba(0,0,0,.5);
     --shadow-btn:0 1px 2px rgba(0,0,0,.4);
@@ -64,6 +66,7 @@
   }
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
 html,body{margin:0;padding:0}
 body{
   background:var(--paper);
@@ -118,15 +121,6 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .day span{display:block;font-size:10.5px;opacity:.75;line-height:1.2}
 
 /* ---------- lists ---------- */
-.group{margin-top:26px}
-.group-head{
-  display:flex;align-items:center;gap:12px;padding:0 var(--pad) 8px;
-}
-.group-name{font-size:13.5px;font-weight:600;letter-spacing:.02em;white-space:nowrap;display:flex;align-items:center}
-.group-name::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--cc,var(--teal-dim));margin-inline-end:8px}
-.group-line{flex:1;height:1px;background:var(--rule)}
-.group-count{font-size:12.5px;color:var(--muted);white-space:nowrap}
-
 .row{
   display:flex;align-items:center;gap:13px;width:100%;text-align:start;
   min-height:var(--tap);padding:9px var(--pad);
@@ -150,7 +144,6 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .row-main{flex:1;min-width:0}
 .row-name{font-size:15.5px;line-height:1.3;word-break:break-word}
 .row.done .row-name{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
-.row-meta{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.3;word-break:break-word}
 
 /* ---------- today: hero + ring ---------- */
 .hero{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px var(--pad) 4px}
@@ -202,24 +195,40 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .btn:active{opacity:.8;transform:scale(.98)}
 
 .page-head{
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:18px var(--pad) 14px;
-  background:var(--surface);border-bottom:1px solid var(--rule);
+  display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
+  padding:22px var(--pad) 0;
 }
-.page-head h1{font-size:19px;font-weight:600;margin:0;letter-spacing:.01em}
+.page-head h1{font-family:var(--display);font-weight:800;font-size:48px;line-height:.9;margin:0;letter-spacing:.005em}
+.page-sub{padding:8px var(--pad) 0;font-size:14px;color:var(--muted)}
 .link{font-size:14px;color:var(--teal);font-weight:500}
-
-.filterbar{
-  display:flex;gap:8px;padding:12px var(--pad);overflow-x:auto;
-  background:var(--surface);border-bottom:1px solid var(--rule);
+.pill{
+  display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 14px;border-radius:999px;
+  background:var(--surface);border:1px solid var(--rule-soft);font-size:13.5px;font-weight:600;color:var(--ink);
+  transition:transform .1s;
 }
+.pill:active{transform:scale(.96)}
+.pill svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.btn.primary{background:var(--cc,var(--ink));color:var(--on-c);font-weight:600}
+.btn.add{border-radius:18px;min-height:54px;font-weight:600}
+.btn.add svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+
+.filterbar{display:flex;gap:8px;padding:16px var(--pad) 2px;overflow-x:auto}
 .filterbar::-webkit-scrollbar{display:none}
 .chip{
-  flex:0 0 auto;min-height:32px;padding:0 14px;border-radius:999px;
-  background:var(--paper);color:var(--muted);font-size:13px;font-weight:600;
+  flex:0 0 auto;min-height:34px;padding:0 14px;border-radius:999px;
+  background:var(--surface);color:var(--muted);font-size:13px;font-weight:600;
   border:1px solid var(--rule-soft);white-space:nowrap;transition:background .15s,color .15s;
 }
-.chip.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.chip.on{background:var(--teal);color:var(--on-c);border-color:var(--teal)}
+
+/* ---------- library rows ---------- */
+.cat-edit{flex:0 0 auto;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;color:var(--muted);background:var(--paper)}
+.cat-edit svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.cat-note{padding:0 18px 16px;font-size:13px;color:var(--muted)}
+.lib-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px;font-size:12.5px;color:var(--muted)}
+.daydots{display:inline-flex;gap:3px;direction:ltr}
+.daydots i{font-style:normal;width:18px;height:18px;border-radius:6px;display:grid;place-items:center;font-size:10px;font-weight:700;color:var(--muted);background:var(--paper)}
+.daydots i.on{background:var(--cc);color:var(--on-c)}
 
 /* ---------- tabbar ---------- */
 .tabs{
@@ -235,59 +244,84 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .tab.on::before{content:"";position:absolute;top:1px;width:26px;height:3px;border-radius:2px;background:var(--ink)}
 
 /* ---------- sheet ---------- */
-.scrim{position:fixed;inset:0;background:rgba(18,33,31,.42);z-index:50;display:none}
-.scrim.on{display:block}
+.scrim{position:fixed;inset:0;background:rgba(6,10,16,.55);z-index:50;display:none}
+.scrim.on{display:block;animation:fadeIn .22s ease-out}
+@keyframes fadeIn{from{opacity:0}}
 .sheet{
   position:fixed;left:0;right:0;bottom:0;z-index:51;
   max-width:620px;margin:0 auto;max-height:92vh;overflow-y:auto;
-  background:var(--paper);border-radius:18px 18px 0 0;
+  background:var(--paper);border-radius:24px 24px 0 0;
   box-shadow:var(--shadow-lg);
   padding:8px var(--pad) calc(24px + var(--safe-b));
   display:none;
 }
-.sheet.on{display:block}
+.sheet::before{content:"";position:absolute;inset-inline:0;top:0;height:4px;background:var(--cc,transparent);border-radius:24px 24px 0 0}
+.sheet.on{display:block;animation:sheetUp .34s cubic-bezier(.2,.8,.3,1)}
+@keyframes sheetUp{from{transform:translateY(48px);opacity:0}}
 .grab{width:38px;height:4px;border-radius:2px;background:var(--rule);margin:8px auto 14px}
-.sheet h2{font-size:17px;font-weight:600;margin:0 0 18px}
-.field{margin-bottom:16px}
-.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+.sheet-head{display:flex;align-items:center;gap:14px;margin:4px 0 22px}
+.sheet-head .cat-icon{width:54px;height:54px;border-radius:17px;transition:background .2s,color .2s}
+.sheet-head .cat-icon svg{width:36px;height:36px}
+.sheet h2{font-family:var(--display);font-weight:800;font-size:34px;line-height:.95;margin:0}
+.field{margin-bottom:18px}
+.field label,.field-label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px}
 .field input[type=text],.field select,.field textarea{
-  width:100%;min-height:46px;padding:10px 12px;
-  border:1px solid var(--rule);border-radius:var(--r);background:var(--surface);
+  width:100%;min-height:48px;padding:10px 14px;
+  border:1px solid var(--rule);border-radius:14px;background:var(--surface);
+  transition:border-color .15s,box-shadow .15s;
 }
+.field input[type=text]:focus{outline:none;border-color:var(--cc,var(--teal));box-shadow:0 0 0 3px color-mix(in srgb,var(--cc,var(--teal)) 25%,transparent)}
 .field textarea{min-height:64px;resize:vertical}
+.field-hint{margin-top:8px;font-size:12.5px;color:var(--muted);line-height:1.4}
+.optpick{display:flex;flex-wrap:wrap;gap:8px}
+.opt{
+  display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:0 14px;border-radius:999px;
+  border:1px solid var(--rule);background:var(--surface);font-size:13.5px;font-weight:600;color:var(--muted);
+  transition:background .15s,color .15s,border-color .15s,transform .1s;
+}
+.opt:active{transform:scale(.95)}
+.opt svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.opt.on{background:var(--oc,var(--cc,var(--ink)));border-color:var(--oc,var(--cc,var(--ink)));color:var(--on-c)}
+.opt.add{border-style:dashed}
+.opt.add svg{width:14px;height:14px}
 .daypick{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
 .daypick button{
-  min-height:44px;border:1px solid var(--rule);border-radius:8px;background:var(--surface);
-  font-size:13px;color:var(--muted);transition:background .15s,color .15s;
+  min-height:46px;border:1px solid var(--rule);border-radius:12px;background:var(--surface);
+  font-size:13px;font-weight:600;color:var(--muted);transition:background .15s,color .15s,transform .1s;
 }
-.daypick button.on{background:var(--ink);color:var(--surface);border-color:var(--ink);font-weight:600}
-.checkline{display:flex;align-items:center;gap:10px;min-height:46px}
-.checkline input{width:20px;height:20px;accent-color:var(--teal)}
-.sheet-actions{display:flex;gap:10px;margin-top:22px}
-.sheet-actions .btn{flex:1}
+.daypick button:active{transform:scale(.92)}
+.daypick button.on{background:var(--cc,var(--ink));color:var(--on-c);border-color:var(--cc,var(--ink))}
+.checkline{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;padding:0 16px;border:1px solid var(--rule-soft);border-radius:16px;background:var(--surface)}
+.checkline label{margin:0;font-size:14.5px;color:var(--ink);font-weight:500}
+.switch{appearance:none;-webkit-appearance:none;flex:0 0 auto;width:48px;height:28px;margin:0;border-radius:999px;background:var(--rule);position:relative;cursor:pointer;transition:background .2s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .22s cubic-bezier(.2,.8,.3,1.3)}
+.switch:checked{background:var(--cc,var(--teal))}
+.switch:checked::after{transform:translateX(20px)}
+.sheet-actions{display:flex;gap:10px;margin-top:24px}
+.sheet-actions .btn{flex:1;border-radius:14px;min-height:50px}
+.sheet .btn.danger{border-radius:14px}
 
 /* ---------- day-feed progress ---------- */
-.daycard{
-  margin:0 var(--pad) 14px;border:1px solid var(--rule-soft);border-radius:14px;
-  background:var(--surface);box-shadow:var(--shadow);overflow:hidden;
-}
-.daycard.today{border-color:var(--teal-dim)}
-.daycard-head{
-  display:block;width:100%;text-align:start;padding:12px 16px;
-  font-size:13.5px;font-weight:600;background:var(--rule-soft);color:var(--ink);
-}
-.daycard.today .daycard-head{background:var(--teal-dim);color:var(--surface)}
-.daycard-head[data-tap="1"]{cursor:pointer}
+.pday-head{display:flex;align-items:center;gap:12px;width:100%;text-align:start;padding:14px 16px 10px 18px}
+.pday-title{flex:1;min-width:0}
+.pday-name{display:block;font-family:var(--display);font-weight:800;font-size:28px;line-height:1}
+.pday-date{display:block;font-size:12.5px;color:var(--muted);margin-top:4px}
+.pday-count{font-family:var(--display);font-weight:800;font-size:22px;color:var(--muted)}
+.pday.all .pday-count{color:var(--teal)}
+.segbar{display:flex;gap:3px;padding:0 16px 14px 18px}
+.segbar i{flex:1;height:6px;border-radius:3px;background:var(--rule-soft)}
+.segbar i.done{background:var(--cc)}
 .dayitem{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  padding:10px 16px;border-top:1px solid var(--rule-soft);font-size:14.5px;
+  display:flex;align-items:center;gap:12px;
+  padding:11px 16px 11px 18px;border-top:1px solid var(--rule-soft);font-size:14.5px;
 }
-.dayitem-name{min-width:0;word-break:break-word}
-.dayitem-mark{font-size:15px;color:var(--rule);flex:0 0 auto}
+.dayitem-dot{flex:0 0 auto;width:8px;height:8px;border-radius:50%;background:var(--cc,var(--teal))}
+.dayitem-name{flex:1;min-width:0;word-break:break-word}
+.dayitem-mark{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:2px solid var(--rule);display:grid;place-items:center}
+.dayitem-mark svg{width:12px;height:12px}
 .dayitem.done .dayitem-name{color:var(--muted)}
-.dayitem.done .dayitem-mark{color:var(--cc,var(--teal));font-weight:700}
+.dayitem.done .dayitem-mark{background:var(--cc,var(--teal));border-color:var(--cc,var(--teal))}
 
-.note{padding:16px var(--pad);font-size:12.5px;color:var(--muted);line-height:1.5}
 
 .toast{
   position:fixed;left:50%;transform:translateX(-50%);bottom:calc(90px + var(--safe-b));z-index:60;
@@ -319,12 +353,13 @@ button{background:none;border:0;padding:0;cursor:pointer}
   <section class="view" id="v-lib">
     <div class="page-head">
       <h1>Library</h1>
-      <button class="link" id="addCatBtn">Add category</button>
+      <button class="pill" id="addCatBtn"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>Category</button>
     </div>
+    <div class="page-sub" id="libSub"></div>
     <div class="filterbar" id="libFilterBar"></div>
     <div id="libList"></div>
     <div style="padding:22px var(--pad) 8px">
-      <button class="btn wide" id="addExBtn">Add exercise</button>
+      <button class="btn wide add" id="addExBtn"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>Add exercise</button>
     </div>
   </section>
 
@@ -332,8 +367,9 @@ button{background:none;border:0;padding:0;cursor:pointer}
   <section class="view" id="v-wprog">
     <div class="page-head">
       <h1>Progress</h1>
-      <button class="link" id="dataBtn">Data</button>
+      <button class="pill" id="dataBtn"><svg viewBox="0 0 16 16"><path d="M8 2.5v8M4.5 7L8 10.5 11.5 7M3 13.5h10"/></svg>Backup</button>
     </div>
+    <div class="page-sub">Last 84 days. Tap a day to open it.</div>
     <div id="wprogBody"></div>
   </section>
 
@@ -342,9 +378,10 @@ button{background:none;border:0;padding:0;cursor:pointer}
     <div class="page-head">
       <h1>Tasks</h1>
     </div>
+    <div class="page-sub" id="taskSub"></div>
     <div id="taskList"></div>
     <div style="padding:22px var(--pad) 8px">
-      <button class="btn wide" id="addTaskBtn">Add task</button>
+      <button class="btn wide add" id="addTaskBtn"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>Add task</button>
     </div>
   </section>
 
@@ -352,8 +389,9 @@ button{background:none;border:0;padding:0;cursor:pointer}
   <section class="view" id="v-tprog">
     <div class="page-head">
       <h1>Progress</h1>
-      <button class="link" id="dataBtn2">Data</button>
+      <button class="pill" id="dataBtn2"><svg viewBox="0 0 16 16"><path d="M8 2.5v8M4.5 7L8 10.5 11.5 7M3 13.5h10"/></svg>Backup</button>
     </div>
+    <div class="page-sub">Last 84 days.</div>
     <div id="tprogBody"></div>
   </section>
 
@@ -543,13 +581,91 @@ const CAT_ICONS = {
 const CLOCK_SVG = '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/></svg>';
 const REPS_SVG = '<svg viewBox="0 0 16 16"><path d="M3 6.5A5 5 0 0 1 12.5 5M13 9.5A5 5 0 0 1 3.5 11"/><path d="M12.5 2v3h-3M3.5 14v-3h3"/></svg>';
 
-function catStyle(cat){
-  const n = (cat && cat.name || "").toLowerCase();
+const UI_ICONS = {
+  pin:'<svg viewBox="0 0 40 40"><path d="M15 6h10l-2 10 6 6H11l6-6z"/><path d="M20 22v12"/></svg>',
+  sun:'<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="6"/><path d="M20 5v5M20 30v5M5 20h5M30 20h5M9.4 9.4l3.5 3.5M27.1 27.1l3.5 3.5M9.4 30.6l3.5-3.5M27.1 12.9l3.5-3.5"/></svg>',
+  data:'<svg viewBox="0 0 40 40"><ellipse cx="20" cy="10" rx="12" ry="4.5"/><path d="M8 10v20c0 2.5 5.4 4.5 12 4.5s12-2 12-4.5V10M8 20c0 2.5 5.4 4.5 12 4.5s12-2 12-4.5"/></svg>',
+  plus:'<svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>',
+  pencil:'<svg viewBox="0 0 20 20"><path d="M4 16l1-4 8-8 3 3-8 8z"/><path d="M11 6l3 3"/></svg>'
+};
+
+function styleFor(name, idx){
+  const n = (name || "").toLowerCase();
   if(/stretch|posture|mobil/.test(n)) return { color:"var(--c1)", icon:CAT_ICONS.stretch };
   if(/calisth|strength|push|pull/.test(n)) return { color:"var(--c2)", icon:CAT_ICONS.pull };
   if(/punch|grip|forearm|box/.test(n)) return { color:"var(--c3)", icon:CAT_ICONS.fist };
-  const i = Math.max(0, state.categories.indexOf(cat));
-  return { color:["var(--c4)","var(--c5)","var(--c6)"][i % 3], icon:CAT_ICONS.other };
+  return { color:["var(--c4)","var(--c5)","var(--c6)"][Math.max(0, idx) % 3], icon:CAT_ICONS.other };
+}
+function catStyle(cat){
+  return styleFor(cat && cat.name, state.categories.indexOf(cat));
+}
+function catOfId(id){ return state.categories.find(c => c.id === id); }
+function byCategoryOrder(list){
+  const idx = id => state.categories.findIndex(c => c.id === id);
+  return list.slice().sort((a, b) => idx(a.cat) - idx(b.cat));
+}
+
+function catCard(color, icon, title, countText, extra){
+  const sec = el("section","cat");
+  sec.style.setProperty("--cc", color);
+  const head = el("div","cat-head");
+  const ic = el("span","cat-icon");
+  ic.innerHTML = icon;
+  ic.setAttribute("aria-hidden","true");
+  const nm = el("span","cat-name");
+  bidi(nm, title);
+  head.appendChild(ic); head.appendChild(nm);
+  if(countText !== null) head.appendChild(el("span","cat-count", countText));
+  if(extra) head.appendChild(extra);
+  sec.appendChild(head);
+  return sec;
+}
+
+function dayDots(days){
+  const w = el("span","daydots");
+  w.setAttribute("aria-label", days.length ? days.map(d => DAY_ABBR[d]).join(", ") : "Not scheduled");
+  DAY_ABBR.forEach((d, i) => w.appendChild(el("i", days.includes(i) ? "on" : "", d[0])));
+  return w;
+}
+
+function sheetHead(body, title, icon){
+  const h = el("div","sheet-head");
+  const ic = el("span","cat-icon");
+  ic.innerHTML = icon;
+  ic.setAttribute("aria-hidden","true");
+  h.appendChild(ic);
+  h.appendChild(el("h2", null, title));
+  body.appendChild(h);
+  return {
+    setLook(color, icon2){
+      document.getElementById("sheet").style.setProperty("--cc", color);
+      ic.innerHTML = icon2;
+    }
+  };
+}
+
+function optPicker(getItems, selected, onPick, extra){
+  const wrap = el("div","optpick");
+  let sel = selected;
+  const render = () => {
+    wrap.innerHTML = "";
+    getItems().forEach(it => {
+      const on = it.value === sel;
+      const b = el("button","opt" + (on ? " on" : ""));
+      b.type = "button";
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+      if(it.color) b.style.setProperty("--oc", it.color);
+      if(it.icon) b.insertAdjacentHTML("beforeend", it.icon);
+      const s = el("span");
+      bidi(s, it.label);
+      b.appendChild(s);
+      b.onclick = () => { sel = (on && it.toggle) ? "" : it.value; onPick(sel); render(); };
+      wrap.appendChild(b);
+    });
+    if(extra) wrap.appendChild(extra);
+  };
+  render();
+  return { el:wrap, set(v){ sel = v; render(); } };
 }
 
 function doseChip(dose){
@@ -739,9 +855,12 @@ function renderLib(){
   renderLibFilter();
   const wrap = document.getElementById("libList");
   wrap.innerHTML = "";
-  if(!state.exercises.length){
+  const nEx = state.exercises.length, nCat = state.categories.length;
+  document.getElementById("libSub").textContent =
+    nEx + (nEx === 1 ? " exercise" : " exercises") + " in " + nCat + (nCat === 1 ? " category" : " categories");
+  if(!nEx && !nCat){
     const e = el("div","empty-state");
-    e.appendChild(el("p", null, "Your library is empty. Add exercises in English or Arabic — both work."));
+    e.appendChild(el("p", null, "Your library is empty. Add a category first, then your exercises."));
     wrap.appendChild(e);
     return;
   }
@@ -752,24 +871,14 @@ function renderLib(){
     if(libFilter && !items.length) return;
     shown += items.length;
 
-    const g = el("div","group");
-    g.style.setProperty("--cc", catStyle(cat).color);
-    const gh = el("div","group-head");
-    const gn = el("div","group-name");
-    bidi(gn, cat.name);
-    const gl = el("div","group-line");
-    const gc = el("button","group-count");
-    gc.textContent = items.length ? items.length + " · edit" : "edit";
-    gc.style.color = "var(--teal)";
-    gc.onclick = () => openCatSheet(cat);
-    gh.appendChild(gn); gh.appendChild(gl); gh.appendChild(gc);
-    g.appendChild(gh);
+    const edit = el("button","cat-edit");
+    edit.innerHTML = UI_ICONS.pencil;
+    edit.setAttribute("aria-label","Edit category " + cat.name);
+    edit.onclick = () => openCatSheet(cat);
+    const s = catStyle(cat);
+    const sec = catCard(s.color, s.icon, cat.name, String(items.length), edit);
 
-    if(!items.length){
-      const p = el("div","note", "No exercises in this category yet.");
-      p.style.padding = "4px var(--pad) 10px";
-      g.appendChild(p);
-    }
+    if(!items.length) sec.appendChild(el("div","cat-note","No exercises here yet."));
     items.forEach(ex => {
       const row = el("div","row");
       row.setAttribute("role","button");
@@ -778,25 +887,18 @@ function renderLib(){
       const n = el("div","row-name");
       bidi(n, ex.name);
       main.appendChild(n);
-      const dayStr = ex.days.length === 7 ? "Every day"
-        : ex.days.length ? ex.days.slice().sort().map(d => DAY_ABBR[d]).join(" ")
-        : "Not scheduled";
-      const metaBits = [dayStr];
-      if(ex.dose) metaBits.push(ex.dose);
-      if(ex.target) metaBits.push(ex.target);
-      const m = el("div","row-meta");
-      bidi(m, metaBits.join(" · "));
-      main.appendChild(m);
+      const meta = el("div","lib-meta");
+      meta.appendChild(dayDots(ex.days));
+      if(ex.target) meta.appendChild(el("span", null, ex.target));
+      main.appendChild(meta);
       row.appendChild(main);
-      const chev = el("div","group-count","›");
-      chev.style.fontSize = "20px";
-      row.appendChild(chev);
+      if(ex.dose) row.appendChild(doseChip(ex.dose));
       const open = () => openExSheet(ex);
       row.onclick = open;
       row.onkeydown = e => { if(e.key === "Enter"){ e.preventDefault(); open(); } };
-      g.appendChild(row);
+      sec.appendChild(row);
     });
-    wrap.appendChild(g);
+    wrap.appendChild(sec);
   });
   if(libFilter && !shown){
     wrap.appendChild(el("div","empty-state","No exercises target " + libFilter + " yet."));
@@ -804,7 +906,10 @@ function renderLib(){
 }
 
 /* ============ sheets ============ */
-function openSheet(build){
+function openSheet(build, color){
+  const sheet = document.getElementById("sheet");
+  if(color) sheet.style.setProperty("--cc", color); else sheet.style.removeProperty("--cc");
+  sheet.scrollTop = 0;
   const body = document.getElementById("sheetBody");
   body.innerHTML = "";
   build(body);
@@ -839,79 +944,71 @@ function openExSheet(ex){
     ? JSON.parse(JSON.stringify(ex))
     : { id: uid(), cat: state.categories[0] ? state.categories[0].id : null, name:"", target:"", dose:"", days:[] };
 
+  const look = () => catStyle(catOfId(draft.cat));
+
   openSheet(body => {
-    body.appendChild(el("h2", null, editing ? "Edit exercise" : "New exercise"));
+    const head = sheetHead(body, editing ? "Edit exercise" : "New exercise", look().icon);
 
     const nameI = textInput(draft.name, "Exercise name — English or العربية");
     body.appendChild(makeField("Name", nameI));
 
-    const catS = document.createElement("select");
-    state.categories.forEach(c => {
-      const o = document.createElement("option");
-      o.value = c.id; o.textContent = c.name;
-      o.setAttribute("dir","auto");
-      if(c.id === draft.cat) o.selected = true;
-      catS.appendChild(o);
-    });
-    body.appendChild(makeField("Category", catS));
+    const catPick = optPicker(
+      () => state.categories.map(c => { const s = catStyle(c); return { value:c.id, label:c.name, color:s.color, icon:s.icon }; }),
+      draft.cat,
+      v => { draft.cat = v; const s = look(); head.setLook(s.color, s.icon); }
+    );
+    const catF = el("div","field");
+    catF.appendChild(el("span","field-label","Category"));
+    catF.appendChild(catPick.el);
+    body.appendChild(catF);
 
-    const doseI = textInput(draft.dose, "3 × 12 / 30s");
+    const doseI = textInput(draft.dose, "3 × 12   or   30s");
     body.appendChild(makeField("Sets / reps / time", doseI));
 
-    const targetS = document.createElement("select");
-    function fillTargetOptions(selected){
-      targetS.innerHTML = "";
-      const noneO = document.createElement("option");
-      noneO.value = ""; noneO.textContent = "—";
-      if(!selected) noneO.selected = true;
-      targetS.appendChild(noneO);
-      state.muscles.forEach(m => {
-        const o = document.createElement("option");
-        o.value = m; o.textContent = m;
-        if(m === selected) o.selected = true;
-        targetS.appendChild(o);
-      });
-    }
-    fillTargetOptions(draft.target);
+    const addChip = el("button","opt add");
+    addChip.type = "button";
+    addChip.innerHTML = UI_ICONS.plus;
+    addChip.appendChild(el("span", null, "New"));
+    const targetPick = optPicker(
+      () => state.muscles.map(m => ({ value:m, label:m, toggle:true })),
+      draft.target,
+      v => { draft.target = v; },
+      addChip
+    );
+    const targetF = el("div","field");
+    targetF.appendChild(el("span","field-label","What it targets (optional)"));
+    targetF.appendChild(targetPick.el);
 
-    const targetF = makeField("What it targets (optional)", targetS);
+    const newRow = el("div","two");
+    newRow.hidden = true;
+    newRow.style.marginTop = "10px";
+    const newI = textInput("", "e.g. Calves");
+    const newAdd = el("button","btn ghost","Add");
+    newAdd.type = "button";
+    newRow.appendChild(newI);
+    newRow.appendChild(newAdd);
+    targetF.appendChild(newRow);
 
-    const addTargetLink = el("button","link","+ Add new target");
-    addTargetLink.type = "button";
-    addTargetLink.style.display = "block";
-    addTargetLink.style.marginTop = "8px";
-    targetF.appendChild(addTargetLink);
-
-    const newTargetRow = el("div","two");
-    newTargetRow.style.display = "none";
-    newTargetRow.style.marginTop = "8px";
-    const newTargetI = textInput("", "e.g. Calves");
-    const newTargetAdd = el("button","btn ghost","Add");
-    newTargetAdd.type = "button";
-    newTargetRow.appendChild(newTargetI);
-    newTargetRow.appendChild(newTargetAdd);
-    targetF.appendChild(newTargetRow);
-
-    addTargetLink.onclick = () => {
-      const show = newTargetRow.style.display === "none";
-      newTargetRow.style.display = show ? "grid" : "none";
-      if(show) setTimeout(() => newTargetI.focus(), 30);
+    addChip.onclick = () => {
+      newRow.hidden = !newRow.hidden;
+      if(!newRow.hidden) setTimeout(() => newI.focus(), 30);
     };
     const commitNewTarget = () => {
-      const name = newTargetI.value.trim();
+      const name = newI.value.trim();
       if(!name) return;
       const existing = state.muscles.find(m => m.toLowerCase() === name.toLowerCase());
       if(!existing){
         state.muscles.push(name);
         save();
       }
-      fillTargetOptions(existing || name);
-      newTargetI.value = "";
-      newTargetRow.style.display = "none";
+      draft.target = existing || name;
+      targetPick.set(draft.target);
+      newI.value = "";
+      newRow.hidden = true;
       toast(existing ? "Already in the list" : "Added");
     };
-    newTargetAdd.onclick = commitNewTarget;
-    newTargetI.onkeydown = e => { if(e.key === "Enter"){ e.preventDefault(); commitNewTarget(); } };
+    newAdd.onclick = commitNewTarget;
+    newI.onkeydown = e => { if(e.key === "Enter"){ e.preventDefault(); commitNewTarget(); } };
 
     body.appendChild(targetF);
 
@@ -932,14 +1029,15 @@ function openExSheet(ex){
     const acts = el("div","sheet-actions");
     const cancel = el("button","btn ghost","Cancel");
     cancel.onclick = closeSheet;
-    const savB = el("button","btn", editing ? "Save changes" : "Add exercise");
+    const savB = el("button","btn primary", editing ? "Save changes" : "Add exercise");
     savB.onclick = () => {
       const name = nameI.value.trim();
       if(!name){ toast("Give the exercise a name"); nameI.focus(); return; }
+      if(!draft.cat){ toast("Add a category first"); return; }
       if(!draft.days.length){ toast("Pick at least one day"); return; }
       const rec = {
-        id: draft.id, cat: catS.value, name: name,
-        target: targetS.value, dose: doseI.value.trim(),
+        id: draft.id, cat: draft.cat, name: name,
+        target: draft.target || "", dose: doseI.value.trim(),
         days: draft.days.slice().sort()
       };
       const idx = state.exercises.findIndex(e => e.id === rec.id);
@@ -963,20 +1061,25 @@ function openExSheet(ex){
       body.appendChild(del);
     }
     setTimeout(() => nameI.focus(), 60);
-  });
+  }, look().color);
 }
 
 function openCatSheet(cat){
   const editing = !!cat;
+  const idx = editing ? state.categories.indexOf(cat) : state.categories.length;
+  const start = styleFor(editing ? cat.name : "", idx);
   openSheet(body => {
-    body.appendChild(el("h2", null, editing ? "Edit category" : "New category"));
+    const head = sheetHead(body, editing ? "Edit category" : "New category", start.icon);
     const nameI = textInput(editing ? cat.name : "", "Category name — English or العربية");
-    body.appendChild(makeField("Name", nameI));
+    const nameF = makeField("Name", nameI);
+    nameF.appendChild(el("div","field-hint","The icon and color follow the name. Try words like stretch, posture, calisthenics, grip or punch."));
+    body.appendChild(nameF);
+    nameI.oninput = () => { const s = styleFor(nameI.value, idx); head.setLook(s.color, s.icon); };
 
     const acts = el("div","sheet-actions");
     const cancel = el("button","btn ghost","Cancel");
     cancel.onclick = closeSheet;
-    const savB = el("button","btn", editing ? "Save changes" : "Add category");
+    const savB = el("button","btn primary", editing ? "Save changes" : "Add category");
     savB.onclick = () => {
       const name = nameI.value.trim();
       if(!name){ toast("Give the category a name"); nameI.focus(); return; }
@@ -1005,36 +1108,54 @@ function openCatSheet(cat){
       };
       body.appendChild(del);
     }
-  });
+    setTimeout(() => nameI.focus(), 60);
+  }, start.color);
 }
 
 /* ============ day-feed progress (shared by workout + tasks) ============ */
-function dayCard(dateStr, items, isDoneFn, onDayTap){
-  const todayStr = iso(new Date());
-  const isToday = dateStr === todayStr;
-  const card = el("div","daycard" + (isToday ? " today" : ""));
+function dayCard(dateStr, items, isDoneFn, onDayTap, colorOf){
+  const isToday = dateStr === iso(new Date());
   const dt = parseISO(dateStr);
-  const label = (isToday ? "Today · " : "") + DAY_ABBR[dt.getDay()] + " " + fmtShort(dateStr);
-  const head = el(onDayTap ? "button" : "div", "daycard-head", label);
-  if(onDayTap){
-    head.setAttribute("data-tap","1");
-    head.onclick = () => onDayTap(dateStr);
-  }
+  const doneN = items.filter(it => isDoneFn(dateStr, it)).length;
+  const card = el("section","cat pday" + (doneN === items.length ? " all" : ""));
+  card.style.setProperty("--cc", isToday ? "var(--teal)" : "var(--rule)");
+
+  const head = el(onDayTap ? "button" : "div", "pday-head");
+  if(onDayTap){ head.type = "button"; head.onclick = () => onDayTap(dateStr); }
+  const t = el("span","pday-title");
+  t.appendChild(el("span","pday-name", DAY_FULL[dt.getDay()]));
+  t.appendChild(el("span","pday-date", (isToday ? "Today, " : "") + fmtShort(dateStr)));
+  head.appendChild(t);
+  head.appendChild(el("span","pday-count", doneN + "/" + items.length));
   card.appendChild(head);
+
+  const bar = el("div","segbar");
+  bar.setAttribute("aria-hidden","true");
+  items.forEach(it => {
+    const i = el("i", isDoneFn(dateStr, it) ? "done" : "");
+    i.style.setProperty("--cc", colorOf(it));
+    bar.appendChild(i);
+  });
+  card.appendChild(bar);
+
   items.forEach(it => {
     const done = isDoneFn(dateStr, it);
     const row = el("div","dayitem" + (done ? " done" : ""));
-    const cat = it.cat && state.categories.find(c => c.id === it.cat);
-    if(cat) row.style.setProperty("--cc", catStyle(cat).color);
+    row.style.setProperty("--cc", colorOf(it));
+    row.appendChild(el("span","dayitem-dot"));
     const nm = el("span","dayitem-name");
     bidi(nm, it.name);
     row.appendChild(nm);
-    row.appendChild(el("span","dayitem-mark", done ? "✔" : "✘"));
+    const mark = el("span","dayitem-mark");
+    if(done) mark.innerHTML = CHECK_SVG;
+    mark.setAttribute("role","img");
+    mark.setAttribute("aria-label", done ? "Done" : "Not done");
+    row.appendChild(mark);
     card.appendChild(row);
   });
   return card;
 }
-function renderDayFeed(wrap, getItemsForDate, isDoneFn, onDayTap, emptyMsg){
+function renderDayFeed(wrap, getItemsForDate, isDoneFn, onDayTap, emptyMsg, colorOf){
   const todayStr = iso(new Date());
   let any = false;
   for(let i = 0; i < HISTORY_DAYS; i++){
@@ -1042,7 +1163,7 @@ function renderDayFeed(wrap, getItemsForDate, isDoneFn, onDayTap, emptyMsg){
     const items = getItemsForDate(d);
     if(!items.length) continue;
     any = true;
-    wrap.appendChild(dayCard(d, items, isDoneFn, onDayTap));
+    wrap.appendChild(dayCard(d, items, isDoneFn, onDayTap, colorOf));
   }
   if(!any) wrap.appendChild(el("div","empty-state", emptyMsg));
 }
@@ -1051,59 +1172,55 @@ function renderDayFeed(wrap, getItemsForDate, isDoneFn, onDayTap, emptyMsg){
 function renderWProg(){
   const wrap = document.getElementById("wprogBody");
   wrap.innerHTML = "";
-  wrap.appendChild(el("div", null)).style.height = "18px";
   renderDayFeed(
     wrap,
-    d => scheduledOn(d),
+    d => byCategoryOrder(scheduledOn(d)),
     (d, ex) => !!(state.log[d] && state.log[d][ex.id] && state.log[d][ex.id].done),
     d => { selectedDate = d; switchMode("workout"); switchView("today"); },
-    state.exercises.length ? "Nothing logged yet — finish a day and it shows up here." : "No exercises yet. Add some in Library."
+    state.exercises.length ? "Nothing logged yet. Finish a day and it shows up here." : "No exercises yet. Add some in Library.",
+    ex => catStyle(catOfId(ex.cat)).color
   );
-  wrap.appendChild(el("div","note","Kept for the last " + HISTORY_DAYS + " days. Tap a day to open it."));
 }
 
 /* ============ TASKS ============ */
+const TASK_COLOR = t => t.pinned ? "var(--c4)" : "var(--c5)";
+let lastTask = null;
+
 function renderTasks(){
   const wrap = document.getElementById("taskList");
   wrap.innerHTML = "";
   const today = iso(new Date());
   const pinned = state.tasks.filter(t => t.pinned && t.date <= today);
   const oneOff = state.tasks.filter(t => !t.pinned && t.date === today);
+  const doneLog = state.taskLog[today] || {};
+  const doneN = pinned.concat(oneOff).filter(t => doneLog[t.id] && doneLog[t.id].done).length;
+  const total = pinned.length + oneOff.length;
+  document.getElementById("taskSub").textContent = total ? doneN + " of " + total + " done today" : "Nothing on your list today";
 
-  if(!pinned.length && !oneOff.length){
+  if(!total){
     const e = el("div","empty-state");
     e.appendChild(el("p", null, "No tasks yet. Pin one to repeat it daily, or add one just for today."));
     wrap.appendChild(e);
+    lastTask = null;
     return;
   }
 
-  if(pinned.length){
-    const g = el("div","group");
-    const gh = el("div","group-head");
-    gh.appendChild(el("div","group-name","Pinned · repeats daily"));
-    gh.appendChild(el("div","group-line"));
-    gh.appendChild(el("div","group-count", pinned.length));
-    g.appendChild(gh);
-    pinned.forEach(t => g.appendChild(taskRow(t)));
-    wrap.appendChild(g);
-  }
-  if(oneOff.length){
-    const g = el("div","group");
-    const gh = el("div","group-head");
-    gh.appendChild(el("div","group-name","Today"));
-    gh.appendChild(el("div","group-line"));
-    gh.appendChild(el("div","group-count", oneOff.length));
-    g.appendChild(gh);
-    oneOff.forEach(t => g.appendChild(taskRow(t)));
-    wrap.appendChild(g);
-  }
+  const section = (list, title, color, icon) => {
+    const d = list.filter(t => doneLog[t.id] && doneLog[t.id].done).length;
+    const sec = catCard(color, icon, title, d + "/" + list.length);
+    list.forEach(t => sec.appendChild(taskRow(t)));
+    wrap.appendChild(sec);
+  };
+  if(pinned.length) section(pinned, "Every day", "var(--c4)", UI_ICONS.pin);
+  if(oneOff.length) section(oneOff, "Just today", "var(--c5)", UI_ICONS.sun);
+  lastTask = null;
 }
 
 function taskRow(t){
   const today = iso(new Date());
   const day = state.taskLog[today] || {};
   const entry = day[t.id] || {};
-  const row = el("div","row" + (entry.done ? " done" : ""));
+  const row = el("div","row" + (entry.done ? " done" : "") + (entry.done && t.id === lastTask ? " pop" : ""));
   row.setAttribute("role","button");
   row.tabIndex = 0;
 
@@ -1120,15 +1237,12 @@ function taskRow(t){
   const name = el("div","row-name");
   bidi(name, t.name);
   main.appendChild(name);
-  if(t.pinned){
-    const m = el("div","row-meta","Repeats daily");
-    main.appendChild(m);
-  }
   row.appendChild(main);
 
-  const chev = el("div","group-count","›");
-  chev.style.fontSize = "20px";
-  row.appendChild(chev);
+  const edit = el("span","cat-edit");
+  edit.innerHTML = UI_ICONS.pencil;
+  edit.setAttribute("aria-hidden","true");
+  row.appendChild(edit);
 
   const openEdit = () => openTaskSheet(t);
   row.onclick = openEdit;
@@ -1141,6 +1255,7 @@ function toggleTask(t){
   if(!state.taskLog[today]) state.taskLog[today] = {};
   const cur = state.taskLog[today][t.id] || { done:false };
   state.taskLog[today][t.id] = { done: !cur.done };
+  lastTask = cur.done ? null : t.id;
   save(); renderTasks();
 }
 
@@ -1149,28 +1264,30 @@ function openTaskSheet(t){
   const draft = editing
     ? JSON.parse(JSON.stringify(t))
     : { id: uid(), name:"", pinned:false, date: iso(new Date()) };
+  const look = pinned => pinned ? { color:"var(--c4)", icon:UI_ICONS.pin } : { color:"var(--c5)", icon:UI_ICONS.sun };
 
   openSheet(body => {
-    body.appendChild(el("h2", null, editing ? "Edit task" : "New task"));
+    const head = sheetHead(body, editing ? "Edit task" : "New task", look(draft.pinned).icon);
 
     const nameI = textInput(draft.name, "Task name — English or العربية");
     body.appendChild(makeField("Name", nameI));
 
     const cl = el("div","checkline");
-    const cb = document.createElement("input");
-    cb.type = "checkbox"; cb.checked = !!draft.pinned; cb.id = "pincb";
     const lb = document.createElement("label");
     lb.setAttribute("for","pincb");
-    lb.textContent = "Pin — repeats every day";
-    lb.style.margin = "0"; lb.style.fontSize = "14.5px"; lb.style.color = "var(--ink)";
-    cl.appendChild(cb); cl.appendChild(lb);
+    lb.textContent = "Repeat every day";
+    const cb = document.createElement("input");
+    cb.type = "checkbox"; cb.className = "switch"; cb.checked = !!draft.pinned; cb.id = "pincb";
+    cb.onchange = () => { const s = look(cb.checked); head.setLook(s.color, s.icon); };
+    cl.appendChild(lb); cl.appendChild(cb);
     const clF = el("div","field"); clF.appendChild(cl);
+    clF.appendChild(el("div","field-hint","Off means it's just for today."));
     body.appendChild(clF);
 
     const acts = el("div","sheet-actions");
     const cancel = el("button","btn ghost","Cancel");
     cancel.onclick = closeSheet;
-    const savB = el("button","btn", editing ? "Save changes" : "Add task");
+    const savB = el("button","btn primary", editing ? "Save changes" : "Add task");
     savB.onclick = () => {
       const name = nameI.value.trim();
       if(!name){ toast("Give the task a name"); nameI.focus(); return; }
@@ -1196,31 +1313,32 @@ function openTaskSheet(t){
       body.appendChild(del);
     }
     setTimeout(() => nameI.focus(), 60);
-  });
+  }, look(draft.pinned).color);
 }
 
 /* ============ TASK PROGRESS ============ */
 function renderTProg(){
   const wrap = document.getElementById("tprogBody");
   wrap.innerHTML = "";
-  wrap.appendChild(el("div", null)).style.height = "18px";
   renderDayFeed(
     wrap,
-    d => tasksOn(d),
+    d => tasksOn(d).sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)),
     (d, t) => !!(state.taskLog[d] && state.taskLog[d][t.id] && state.taskLog[d][t.id].done),
     d => { if(d === iso(new Date())){ switchMode("tasks"); switchView("tasks"); } },
-    state.tasks.length ? "Nothing logged yet." : "No tasks yet. Add one in Tasks."
+    state.tasks.length ? "Nothing logged yet." : "No tasks yet. Add one in Tasks.",
+    TASK_COLOR
   );
-  wrap.appendChild(el("div","note","Kept for the last " + HISTORY_DAYS + " days."));
 }
 
 /* ============ data sheet ============ */
 function openDataSheet(){
   openSheet(body => {
-    body.appendChild(el("h2", null, "Your data"));
-    body.appendChild(el("div","note","Everything lives on this device only. Export regularly — clearing browser data wipes it."));
+    sheetHead(body, "Backup", UI_ICONS.data);
+    const note = el("div","field-hint","Everything lives on this device only. Export a backup to move it to another device, or before clearing browser data.");
+    note.style.margin = "0 0 18px";
+    body.appendChild(note);
 
-    const exp = el("button","btn wide","Export backup (.json)");
+    const exp = el("button","btn wide primary","Export backup (.json)");
     exp.style.marginBottom = "10px";
     exp.onclick = () => {
       const blob = new Blob([JSON.stringify(state, null, 2)], { type:"application/json" });
@@ -1278,7 +1396,7 @@ function openDataSheet(){
       toast("Erased");
     };
     body.appendChild(wipe);
-  });
+  }, "var(--c1)");
 }
 
 /* ============ nav ============ */
