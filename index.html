@@ -11,18 +11,25 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#12211F;
-  --paper:#EDF0EA;
-  --surface:#F6F8F3;
-  --rule:#CBD2C6;
-  --rule-soft:#DEE3D9;
-  --teal:#1F6F63;
-  --teal-dim:#2E8576;
-  --muted:#65756D;
-  --danger:#973524;
+  --ink:#13202E;
+  --paper:#EDF1F5;
+  --surface:#F9FBFD;
+  --rule:#CDD5DE;
+  --rule-soft:#E0E6ED;
+  --teal:#0B8F82;
+  --teal-dim:#12A596;
+  --muted:#5E6B7A;
+  --danger:#C23A3A;
+  --c1:#0B9A8C;
+  --c2:#D98200;
+  --c3:#D9304A;
+  --c4:#6B4FE0;
+  --c5:#2E9E45;
+  --c6:#D1439A;
+  --display:"Big Shoulders Display","IBM Plex Sans Arabic",system-ui,sans-serif;
   --r:10px;
   --tap:52px;
   --pad:18px;
@@ -35,15 +42,21 @@
 }
 @media (prefers-color-scheme:dark){
   :root{
-    --ink:#EAF0EC;
-    --paper:#141B19;
-    --surface:#1E2823;
-    --rule:#3A4A43;
-    --rule-soft:#233029;
-    --teal:#3AB39D;
-    --teal-dim:#2C8876;
-    --muted:#93A69D;
-    --danger:#E2725E;
+    --ink:#EAF1F7;
+    --paper:#0F1620;
+    --surface:#18222E;
+    --rule:#2E3B4B;
+    --rule-soft:#212D3B;
+    --teal:#3DD6C6;
+    --teal-dim:#2BB3A5;
+    --muted:#8C9BAD;
+    --danger:#FF6B6B;
+    --c1:#3DD6C6;
+    --c2:#FFB020;
+    --c3:#FF4D5E;
+    --c4:#9B7BFF;
+    --c5:#5BD66B;
+    --c6:#FF7AC6;
     --shadow:0 2px 10px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.3);
     --shadow-lg:0 -8px 28px rgba(0,0,0,.5);
     --shadow-btn:0 1px 2px rgba(0,0,0,.4);
@@ -110,7 +123,7 @@ button{background:none;border:0;padding:0;cursor:pointer}
   display:flex;align-items:center;gap:12px;padding:0 var(--pad) 8px;
 }
 .group-name{font-size:13.5px;font-weight:600;letter-spacing:.02em;white-space:nowrap;display:flex;align-items:center}
-.group-name::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--teal-dim);margin-inline-end:8px}
+.group-name::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--cc,var(--teal-dim));margin-inline-end:8px}
 .group-line{flex:1;height:1px;background:var(--rule)}
 .group-count{font-size:12.5px;color:var(--muted);white-space:nowrap}
 
@@ -122,7 +135,7 @@ button{background:none;border:0;padding:0;cursor:pointer}
 }
 .row:first-of-type{border-top:1px solid var(--rule-soft)}
 .row:active{background:var(--surface)}
-.row.done{background:rgba(31,111,99,.05)}
+.row.done{background:color-mix(in srgb,var(--cc,var(--teal)) 9%,transparent)}
 .box{
   flex:0 0 auto;width:24px;height:24px;border:1.5px solid var(--rule);border-radius:7px;
   display:grid;place-items:center;background:var(--surface);
@@ -130,12 +143,49 @@ button{background:none;border:0;padding:0;cursor:pointer}
 }
 .box:active{transform:scale(.9)}
 .box svg{width:14px;height:14px;opacity:0;transform:scale(.6);transition:opacity .15s,transform .15s}
-.row.done .box{background:var(--teal);border-color:var(--teal)}
+.row.done .box{background:var(--cc,var(--teal));border-color:var(--cc,var(--teal))}
+.row.pop .box{animation:boxPop .42s cubic-bezier(.2,.9,.3,1.5)}
+@keyframes boxPop{0%{transform:scale(.55)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
 .row.done .box svg{opacity:1;transform:scale(1)}
 .row-main{flex:1;min-width:0}
 .row-name{font-size:15.5px;line-height:1.3;word-break:break-word}
 .row.done .row-name{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
 .row-meta{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.3;word-break:break-word}
+
+/* ---------- today: hero + ring ---------- */
+.hero{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px var(--pad) 4px}
+.hero-day{font-family:var(--display);font-weight:800;font-size:48px;line-height:.9;letter-spacing:.005em}
+.hero-sub{margin-top:8px;font-size:14px;color:var(--muted)}
+.ring{position:relative;width:96px;height:96px;flex:0 0 auto}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.ring circle{fill:none;stroke-width:9}
+.ring .seg{stroke:var(--rule-soft)}
+.ring .seg.done{stroke:var(--cc)}
+.ring.draw .seg{animation:segIn .55s both cubic-bezier(.2,.7,.3,1)}
+@keyframes segIn{from{opacity:0;stroke-width:0}to{opacity:1;stroke-width:9}}
+.ring .seg.pop{animation:segPop .5s cubic-bezier(.2,.9,.3,1.4)}
+@keyframes segPop{0%{stroke-width:9}40%{stroke-width:15}100%{stroke-width:9}}
+.ring-num{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring-num b{font-family:var(--display);font-weight:800;font-size:30px;line-height:1}
+.ring-num small{font-size:11px;color:var(--muted)}
+
+/* ---------- today: category sections ---------- */
+.cat{position:relative;margin:18px var(--pad) 0;border-radius:18px;background:var(--surface);border:1px solid var(--rule-soft);overflow:hidden}
+.cat::before{content:"";position:absolute;inset-block:0;inset-inline-start:0;width:4px;background:var(--cc)}
+.cat-head{display:flex;align-items:center;gap:12px;padding:12px 14px 10px 18px}
+.cat-icon{flex:0 0 auto;width:42px;height:42px;border-radius:13px;display:grid;place-items:center;color:var(--cc);background:color-mix(in srgb,var(--cc) 15%,transparent)}
+.cat-icon svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.cat-name{flex:1;min-width:0;font-weight:600;font-size:15px}
+.cat-count{font-family:var(--display);font-weight:800;font-size:22px;color:var(--muted)}
+.cat.full .cat-count{color:var(--cc)}
+.cat.flash{animation:catFlash .9s ease-out}
+@keyframes catFlash{from{box-shadow:0 0 0 0 color-mix(in srgb,var(--cc) 55%,transparent)}to{box-shadow:0 0 0 16px transparent}}
+.cat .row{padding-inline-start:18px}
+.cat .row:last-child{border-bottom:0}
+.dose{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;background:var(--paper);border:1px solid var(--rule-soft);font-size:13px;font-weight:600;white-space:nowrap;direction:ltr}
+.dose svg{width:14px;height:14px;fill:none;stroke:var(--cc,currentColor);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.row.done .dose{opacity:.5}
+.confetti{position:fixed;width:8px;height:12px;border-radius:2px;pointer-events:none;z-index:70}
 
 /* ---------- misc ---------- */
 .empty-state{padding:44px var(--pad);text-align:center;color:var(--muted);font-size:14.5px}
@@ -235,7 +285,7 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .dayitem-name{min-width:0;word-break:break-word}
 .dayitem-mark{font-size:15px;color:var(--rule);flex:0 0 auto}
 .dayitem.done .dayitem-name{color:var(--muted)}
-.dayitem.done .dayitem-mark{color:var(--teal);font-weight:700}
+.dayitem.done .dayitem-mark{color:var(--cc,var(--teal));font-weight:700}
 
 .note{padding:16px var(--pad);font-size:12.5px;color:var(--muted);line-height:1.5}
 
@@ -483,6 +533,87 @@ function renderWeek(){
   });
 }
 
+const DAY_FULL = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const CAT_ICONS = {
+  stretch:'<svg viewBox="0 0 40 40"><circle cx="16" cy="7" r="3.4"/><path d="M17 11c2.5 5 2.5 10 0 15"/><path d="M17.5 14c5-2 9-6 11-11"/><path d="M17 16c-3 1.5-6 2-9 1.5"/><path d="M17 26l-5 10M17 26l7 9"/></svg>',
+  pull:'<svg viewBox="0 0 40 40"><path d="M4 5h32"/><path d="M12 5l4 10M28 5l-4 10"/><circle cx="20" cy="12" r="3.2"/><path d="M16 15h8M20 15v12M20 27l-4 9M20 27l4 9"/></svg>',
+  fist:'<svg viewBox="0 0 40 40"><path d="M14 15v-2a3 3 0 0 1 6 0v1a3 3 0 0 1 6 0v1a3 3 0 0 1 6 0v9c0 6-4.5 10-10.5 10H20c-5.5 0-9-4-9-9v-6a3 3 0 0 1 3-3z"/><path d="M14 21c2.5-1.2 5.5-1 7.5 1.5"/><path d="M3 17h5M2 23h6M3 29h5"/></svg>',
+  other:'<svg viewBox="0 0 40 40"><path d="M9 14v12M13 11v18M27 11v18M31 14v12M13 20h14"/></svg>'
+};
+const CLOCK_SVG = '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/></svg>';
+const REPS_SVG = '<svg viewBox="0 0 16 16"><path d="M3 6.5A5 5 0 0 1 12.5 5M13 9.5A5 5 0 0 1 3.5 11"/><path d="M12.5 2v3h-3M3.5 14v-3h3"/></svg>';
+
+function catStyle(cat){
+  const n = (cat && cat.name || "").toLowerCase();
+  if(/stretch|posture|mobil/.test(n)) return { color:"var(--c1)", icon:CAT_ICONS.stretch };
+  if(/calisth|strength|push|pull/.test(n)) return { color:"var(--c2)", icon:CAT_ICONS.pull };
+  if(/punch|grip|forearm|box/.test(n)) return { color:"var(--c3)", icon:CAT_ICONS.fist };
+  const i = Math.max(0, state.categories.indexOf(cat));
+  return { color:["var(--c4)","var(--c5)","var(--c6)"][i % 3], icon:CAT_ICONS.other };
+}
+
+function doseChip(dose){
+  const t = String(dose).trim();
+  const timed = /\d\s*(s|sec|secs|m|min|mins)\b/i.test(t);
+  const c = el("span","dose");
+  c.innerHTML = timed ? CLOCK_SVG : REPS_SVG;
+  c.appendChild(document.createTextNode(t.replace(/\s*[*×]\s*|\s+x\s+/gi, " × ")));
+  c.setAttribute("aria-label", (timed ? "Time " : "Reps ") + t);
+  return c;
+}
+
+let lastToggled = null;
+let ringDrawnFor = null;
+
+function buildRing(ordered, isDone, done){
+  const ns = "http://www.w3.org/2000/svg";
+  const n = ordered.length, R = 38, C = 2 * Math.PI * R, seg = C / n;
+  const gap = n > 1 ? Math.min(3, seg * .25) : 0;
+  const draw = ringDrawnFor !== selectedDate;
+  ringDrawnFor = selectedDate;
+  const ring = el("div","ring" + (draw ? " draw" : ""));
+  ring.setAttribute("role","img");
+  ring.setAttribute("aria-label", done + " of " + n + " done");
+  const svg = document.createElementNS(ns,"svg");
+  svg.setAttribute("viewBox","0 0 96 96");
+  ordered.forEach((o, i) => {
+    const c = document.createElementNS(ns,"circle");
+    c.setAttribute("cx","48"); c.setAttribute("cy","48"); c.setAttribute("r", String(R));
+    c.setAttribute("stroke-dasharray", (seg - gap) + " " + (C - seg + gap));
+    c.setAttribute("stroke-dashoffset", String(-i * seg));
+    c.setAttribute("class", "seg" + (isDone(o.ex) ? " done" : "") + (o.ex.id === lastToggled ? " pop" : ""));
+    c.style.setProperty("--cc", o.style.color);
+    if(draw) c.style.animationDelay = (i * 30) + "ms";
+    svg.appendChild(c);
+  });
+  ring.appendChild(svg);
+  const num = el("div","ring-num");
+  num.appendChild(el("b", null, String(done)));
+  num.appendChild(el("small", null, "of " + n));
+  ring.appendChild(num);
+  return ring;
+}
+
+function celebrate(colors){
+  if(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const ring = document.querySelector("#todayList .ring");
+  if(!ring || !ring.animate) return;
+  const r = ring.getBoundingClientRect();
+  const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  for(let i = 0; i < 40; i++){
+    const p = el("span","confetti");
+    p.style.background = colors[i % colors.length];
+    p.style.left = cx + "px"; p.style.top = cy + "px";
+    document.body.appendChild(p);
+    const a = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 120;
+    const dx = Math.cos(a) * dist, dy = Math.sin(a) * dist + 80;
+    p.animate([
+      { transform:"translate(-50%,-50%) rotate(0deg)", opacity:1 },
+      { transform:`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) rotate(${Math.random() * 720 - 360}deg)`, opacity:0 }
+    ], { duration:1000 + Math.random() * 600, easing:"cubic-bezier(.15,.6,.35,1)" }).onfinish = () => p.remove();
+  }
+}
+
 function renderToday(){
   renderWeek();
   const wrap = document.getElementById("todayList");
@@ -490,17 +621,27 @@ function renderToday(){
 
   const d = parseISO(selectedDate);
   const isToday = selectedDate === iso(new Date());
-  const head = el("div","group-head");
-  head.style.paddingTop = "22px";
-  const nm = el("div","group-name", (isToday ? "Today · " : "") + DAY_ABBR[d.getDay()] + " " + fmtShort(selectedDate));
-  const ln = el("div","group-line");
-  const st = dayStats(selectedDate);
-  const ct = el("div","group-count", st.total ? st.done + "/" + st.total : "");
-  head.appendChild(nm); head.appendChild(ln); head.appendChild(ct);
-  wrap.appendChild(head);
-
   const list = scheduledOn(selectedDate);
+  const day = state.log[selectedDate] || {};
+  const isDone = ex => !!(day[ex.id] && day[ex.id].done);
+
+  const groups = state.categories
+    .map(cat => ({ cat, style:catStyle(cat), items:list.filter(ex => ex.cat === cat.id) }))
+    .filter(g => g.items.length);
+  const ordered = [];
+  groups.forEach(g => g.items.forEach(ex => ordered.push({ ex, style:g.style })));
+  const done = ordered.filter(o => isDone(o.ex)).length;
+
+  const hero = el("div","hero");
+  const txt = el("div");
+  txt.appendChild(el("div","hero-day", DAY_FULL[d.getDay()]));
+  txt.appendChild(el("div","hero-sub", (isToday ? "Today, " : "") + fmtShort(selectedDate)));
+  hero.appendChild(txt);
+  if(ordered.length) hero.appendChild(buildRing(ordered, isDone, done));
+  wrap.appendChild(hero);
+
   if(!list.length){
+    lastToggled = null;
     const e = el("div","empty-state");
     const p = el("p", null, state.exercises.length
       ? "Nothing scheduled for this day."
@@ -512,13 +653,30 @@ function renderToday(){
     return;
   }
 
-  const ordered = [];
-  state.categories.forEach(cat => {
-    list.filter(ex => ex.cat === cat.id).forEach(ex => ordered.push(ex));
+  groups.forEach(g => {
+    const doneN = g.items.filter(isDone).length;
+    const full = doneN === g.items.length;
+    const justFilled = full && g.items.some(ex => ex.id === lastToggled);
+    const sec = el("section","cat" + (full ? " full" : "") + (justFilled ? " flash" : ""));
+    sec.style.setProperty("--cc", g.style.color);
+    const head = el("div","cat-head");
+    const ic = el("span","cat-icon");
+    ic.innerHTML = g.style.icon;
+    ic.setAttribute("aria-hidden","true");
+    const nm = el("span","cat-name");
+    bidi(nm, g.cat.name);
+    head.appendChild(ic); head.appendChild(nm); head.appendChild(el("span","cat-count", doneN + "/" + g.items.length));
+    sec.appendChild(head);
+    g.items.forEach(ex => sec.appendChild(exRow(ex)));
+    wrap.appendChild(sec);
   });
-  const g = el("div","group");
-  ordered.forEach(ex => g.appendChild(exRow(ex)));
-  wrap.appendChild(g);
+
+  const finishedNow = lastToggled && done === ordered.length && ordered.some(o => o.ex.id === lastToggled);
+  lastToggled = null;
+  if(finishedNow){
+    celebrate(groups.map(g => g.style.color));
+    toast("Day complete");
+  }
 }
 
 const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#F6F8F3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>';
@@ -526,7 +684,7 @@ const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#F6F8F3" stroke-
 function exRow(ex){
   const day = state.log[selectedDate] || {};
   const entry = day[ex.id] || {};
-  const row = el("div","row" + (entry.done ? " done" : ""));
+  const row = el("div","row" + (entry.done ? " done" : "") + (entry.done && ex.id === lastToggled ? " pop" : ""));
   row.setAttribute("role","button");
   row.tabIndex = 0;
 
@@ -539,9 +697,12 @@ function exRow(ex){
   bidi(name, ex.name);
   main.appendChild(name);
   row.appendChild(main);
+  if(ex.dose) row.appendChild(doseChip(ex.dose));
 
   const toggle = () => {
-    setEntry(ex.id, { done: !(state.log[selectedDate] && state.log[selectedDate][ex.id] && state.log[selectedDate][ex.id].done) });
+    const nowDone = !(state.log[selectedDate] && state.log[selectedDate][ex.id] && state.log[selectedDate][ex.id].done);
+    setEntry(ex.id, { done: nowDone });
+    lastToggled = nowDone ? ex.id : null;
     renderToday();
   };
   row.onclick = toggle;
@@ -592,6 +753,7 @@ function renderLib(){
     shown += items.length;
 
     const g = el("div","group");
+    g.style.setProperty("--cc", catStyle(cat).color);
     const gh = el("div","group-head");
     const gn = el("div","group-name");
     bidi(gn, cat.name);
@@ -862,6 +1024,8 @@ function dayCard(dateStr, items, isDoneFn, onDayTap){
   items.forEach(it => {
     const done = isDoneFn(dateStr, it);
     const row = el("div","dayitem" + (done ? " done" : ""));
+    const cat = it.cat && state.categories.find(c => c.id === it.cat);
+    if(cat) row.style.setProperty("--cc", catStyle(cat).color);
     const nm = el("span","dayitem-name");
     bidi(nm, it.name);
     row.appendChild(nm);

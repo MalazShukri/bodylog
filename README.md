@@ -45,8 +45,10 @@ After that it launches full-screen with no browser chrome and works with no sign
 The app has two modes, switched with the pill control at the top: **Workout** and **Tasks**.
 
 **Workout**
-- **Today** — a compact Sunday-anchored day strip at the top to switch days, then a flat
-  checklist of that day's exercises. Tap a row to mark it done.
+- **Today** — a Sunday-anchored day strip to switch days, the day name with a progress ring
+  (one colored segment per exercise), then one section per category showing each exercise's
+  reps or time. Tap a row to mark it done; finishing the whole day sets off a short confetti
+  burst. Each category keeps its own color and icon across Today, Library and Progress.
 - **Library** — add, edit, delete exercises and categories. Every exercise has a category,
   an optional target muscle and dose, and the weekdays it appears on. The target list starts
   with a set of common muscle groups; "+ Add new target" in the exercise sheet lets you add
